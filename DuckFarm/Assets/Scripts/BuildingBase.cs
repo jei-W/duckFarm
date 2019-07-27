@@ -2,17 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuildingBase : MonoBehaviour
+public class BuildingBase : ObjectBase
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
