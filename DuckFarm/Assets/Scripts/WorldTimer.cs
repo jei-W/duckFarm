@@ -33,7 +33,7 @@ public class WorldTimer
     private Dictionary<long, TimerData> _timer = new Dictionary<long, TimerData>();
 
     //콜백이 호출 될 월드타임 기준 시간을 입력받는다
-    long RegisterTimer(long time, Action<long> callback)
+    public long RegisterTimer(long time, Action<long> callback)
     {
         //등록 실패
         if( callback == null )
@@ -50,13 +50,13 @@ public class WorldTimer
         return s_uniqueID++;
     }
 
-    void UnregisterTimer( long id )
+    public void UnregisterTimer( long id )
     {
         if( _timer.ContainsKey(id) )
             _timer.Remove(id);
     }
 
-    void Update( long time )
+    public void Update( long time )
     {
         long currentWorldTime = time;
 
