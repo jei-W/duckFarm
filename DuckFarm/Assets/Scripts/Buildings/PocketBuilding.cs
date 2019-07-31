@@ -12,12 +12,12 @@ public class PocketBuilding : BuildingBase
     // 현재 수용량
     int CurrentCapacity = 0;
 
-    Dictionary<string, ObjectBase> Objects = new Dictionary<string, ObjectBase>();
+    protected Dictionary<string, ObjectBase> Objects = new Dictionary<string, ObjectBase>();
     
     // 오브젝트를 들여보낸다?
-    public bool EnterObject( ObjectBase targetObject )
+    public virtual bool EnterObject( ObjectBase targetObject )
     {
-        if ( CurrentCapacity <= MaximumCapacity )
+        if ( MaximumCapacity <= CurrentCapacity )
             return false;
 
         // 오브젝트를 넣자.
@@ -26,7 +26,7 @@ public class PocketBuilding : BuildingBase
         Debug.Log("Enter");
         targetObject.transform.parent = this.transform;
         var meshRenderer = targetObject.GetComponentInChildren<MeshRenderer>() as MeshRenderer;
-        if ( meshRenderer )
+        if ( meshRenderer != null )
         {
             meshRenderer.enabled = false;
         }
@@ -44,11 +44,19 @@ public class PocketBuilding : BuildingBase
         targetObject.transform.parent = null;
 
         var meshRenderer = targetObject.GetComponent<MeshRenderer>() as MeshRenderer;
-        if ( meshRenderer )
+        if ( meshRenderer != null )
         {
             meshRenderer.enabled = true;
         }
 
         CurrentCapacity--;
+    }
+
+    public virtual void ShowObjectsList()
+    {
+        foreach(var innerObject in Objects)
+        {
+            Debug.Log(innerObject.Key);
+        }
     }
 }

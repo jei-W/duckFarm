@@ -5,6 +5,19 @@ using UnityEngine;
 
 public class World : MonoBehaviour
 {
+    protected World()
+    {
+        _instance = this;
+    }
+    private static World _instance = null;
+    public static World GetInstance()
+    {
+        if( _instance == null )
+            _instance = new World();
+
+        return _instance;
+    }
+
     //public enum 건물타입
     public enum BuildingType { mainStorage, hatchery, shelter, feedFactory }
 
@@ -39,14 +52,14 @@ public class World : MonoBehaviour
         //축사 생성
         PocketBuilding hatch = BuildBuilding(BuildingType.hatchery, new Vector3(3, 0, 3)) as PocketBuilding;
 
-        if ( hatch )
+        if ( hatch != null )
         {
             //알 2개 생성(성별 다름)
-            var duck1 = CreateDuckling(Vector3.zero);
-            var duck2 = CreateDuckling(Vector3.zero);
+            var egg1 = LayEgg(Vector3.zero);
+            var egg2 = LayEgg(Vector3.zero);
 
-            hatch.EnterObject(duck1);
-            hatch.EnterObject(duck2);
+            hatch.EnterObject(egg1);
+            hatch.EnterObject(egg2);
         }
         else
         {
@@ -81,17 +94,43 @@ public class World : MonoBehaviour
 
     //환경 오브젝트 생성??
 
-    //오리 생성함수
-    ObjectBase CreateDuckling( Vector3 position )
+    //알 생성
+    ObjectBase LayEgg( Vector3 position )
     {
-        GameObject duckling = Instantiate(Resources.Load("Prefabs/duck"), position, Quaternion.identity) as GameObject;
+        var resource = Resources.Load("Prefabs/egg");
+        if( resource == null )
+        {
+            Debug.Log("알이 없어..");
+            return null;
+        }
+        GameObject egg = Instantiate(resource, position, Quaternion.identity) as GameObject;
 
-        string objID = $"duck_{s_uniqueID++}";
-        ObjectBase objectBase = duckling.GetComponent<ObjectBase>();
+        string objID = $"egg_{s_uniqueID++}";
+        ObjectBase objectBase = egg.GetComponent<ObjectBase>();
         objectBase.ObjectID = objID;
 
-        ducksList.Add(objID, duckling);
-
         return objectBase;
+    }
+
+    //오리 생성함수
+    public void OnHatchEggInHatchery(Hatchery hatchery, ObjectBase egg)
+    {
+        Debug.Log("삐약");
+
+        GameObject duckling = Instantiate(Resources.Load("Prefabs/duck"), hatchery.transform.position, Quaternion.identity) as GameObject;
+        string objectID = $"duck_{s_uniqueID++}";
+        ObjectBase objectBase = duckling.GetComponent<ObjectBase>();
+        objectBase.ObjectID = objectID;
+
+        ducksList.Add(objectID, duckling);
+
+        GameObject.Destroy(egg.gameObject);
+    }
+
+    public void OnDuckDied( GameObject duck )
+    {
+        string duckID = duck.GetComponent<ObjectBase>().ObjectID;
+        ducksList.Remove(duckID);
+        Debug.Log($"{duckID} : 오리가 죽었다.");
     }
 }

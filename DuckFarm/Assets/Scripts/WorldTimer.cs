@@ -63,7 +63,7 @@ public class WorldTimer
         List<long> reserveToDeleteTimerList = new List<long>();
         foreach( var timer in _timer )
         {
-            if( timer.Value.Time < currentWorldTime )
+            if( timer.Value.Time <= currentWorldTime )
             {
                 timer.Value.Callback?.Invoke(timer.Value.TimerID);
                 reserveToDeleteTimerList.Add(timer.Key);
