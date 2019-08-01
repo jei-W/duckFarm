@@ -15,24 +15,26 @@ public class PocketBuilding : BuildingBase
     protected Dictionary<string, ObjectBase> Objects = new Dictionary<string, ObjectBase>();
     
     // 오브젝트를 들여보낸다?
-    public virtual bool EnterObject( ObjectBase targetObject )
+    public bool AskEnterable()
     {
-        if ( MaximumCapacity <= CurrentCapacity )
+        if( MaximumCapacity <= CurrentCapacity )
             return false;
+        else return true;
+    }
 
-        // 오브젝트를 넣자.
+    public virtual void EnterObject( ObjectBase targetObject )
+    {
         Objects.Add(targetObject.ObjectID, targetObject);
 
         Debug.Log("Enter");
         targetObject.transform.parent = this.transform;
         var meshRenderer = targetObject.GetComponentInChildren<MeshRenderer>() as MeshRenderer;
-        if ( meshRenderer != null )
+        if( meshRenderer != null )
         {
             meshRenderer.enabled = false;
         }
 
         CurrentCapacity++;
-        return true;
     }
 
     public void ExitObject(string objectID)

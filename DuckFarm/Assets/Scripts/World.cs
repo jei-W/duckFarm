@@ -22,7 +22,7 @@ public class World : MonoBehaviour
     public enum BuildingType { mainStorage, hatchery, shelter, feedFactory }
 
     //빌딩 리스트(key=빌딩ID/ value=gameObject)
-    Dictionary<string, GameObject> buildingList = new Dictionary<string, GameObject>();
+    Dictionary<string, BuildingBase> buildingList = new Dictionary<string, BuildingBase>();
     //오리 리스트
     Dictionary<string, GameObject> ducksList = new Dictionary<string, GameObject>();
 
@@ -49,10 +49,14 @@ public class World : MonoBehaviour
     {
         //중앙창고건물 생성
         BuildBuilding(BuildingType.mainStorage, Vector3.zero);
-        //축사 생성
+        //부화장 생성
         PocketBuilding hatch = BuildBuilding(BuildingType.hatchery, new Vector3(3, 0, 3)) as PocketBuilding;
+        //축사 생성
+        PocketBuilding shelter1 = BuildBuilding(BuildingType.shelter, new Vector3(-3, 0, 3)) as PocketBuilding;
+        PocketBuilding shelter2 = BuildBuilding(BuildingType.shelter, new Vector3(3, 0, -3)) as PocketBuilding;
 
-        if ( hatch != null )
+
+        if( hatch != null )
         {
             //알 2개 생성(성별 다름)
             var egg1 = LayEgg(Vector3.zero);
@@ -86,8 +90,9 @@ public class World : MonoBehaviour
 
         BuildingBase objectBase = building.GetComponent<BuildingBase>();
         objectBase.ObjectID = objID;
+        objectBase.buildingType = type;
 
-        buildingList.Add(objID, building);
+        buildingList.Add(objID, objectBase);
 
         return objectBase;
     }
@@ -132,5 +137,50 @@ public class World : MonoBehaviour
         string duckID = duck.GetComponent<ObjectBase>().ObjectID;
         ducksList.Remove(duckID);
         Debug.Log($"{duckID} : 오리가 죽었다.");
+    }
+
+    //가까이에 있는 건물를 알려주자
+    public BuildingBase FindCloseBuilding(ObjectBase finder, BuildingType buildingType)
+    {
+        float minDistance = float.MaxValue;
+        BuildingBase find = null;
+
+        foreach( var building in buildingList )
+        {
+            if( building.Value.buildingType == buildingType )
+            {
+                float distansce = ( building.Value.transform.position - finder.transform.position ).sqrMagnitude;
+                if( minDistance >= distansce )
+                {
+                    minDistance = distansce;
+                    find = building.Value;
+                }
+            }
+        }
+
+        return find;
+    }
+
+    public PocketBuilding FindEnterablePocketBuilding( ObjectBase finder, BuildingType buildingType )
+    {
+        float minDistance = float.MaxValue;
+        PocketBuilding find = null;
+
+        foreach( var building in buildingList )
+        {
+            PocketBuilding pocketBuilding = building.Value as PocketBuilding;
+
+            if( pocketBuilding.buildingType == buildingType && pocketBuilding.AskEnterable() )
+            {
+                float distansce = ( building.Value.transform.position - finder.transform.position ).sqrMagnitude;
+                if( minDistance >= distansce )
+                {
+                    minDistance = distansce;
+                    find = pocketBuilding;
+                }
+            }
+        }
+
+        return find;
     }
 }

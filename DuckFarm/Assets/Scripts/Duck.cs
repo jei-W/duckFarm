@@ -10,6 +10,8 @@ public class Duck : ObjectBase
     float age = 0;
     float hunger = 0;
     float fatigue = 0;
+    public long SomethingStaetTime { get; set; }
+    public float WalkSpeed { get; } = 0.1f;
     public float Hunger { get { return hunger; } set { hunger = value; } }
     public float Fatigue { get { return fatigue; } set { fatigue = value; } }
     public float Stress { get; set; } = 0;

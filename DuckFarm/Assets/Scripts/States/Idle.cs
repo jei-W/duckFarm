@@ -4,10 +4,14 @@ using UnityEngine;
 
 public class Idle : State
 {
+    Vector3 randomPosition;
+
     public Idle( Duck duck ) : base(duck) { }
 
     public override void Enter()
     {
+        randomPosition = owner.transform.position;
+
         //수치 증가속도 초기화
         hungerPace = 2f;
         fatiguePace = 2f;
@@ -31,6 +35,16 @@ public class Idle : State
             owner.ChangeState(owner.stateList["Eat"]);
             return;
         }
-    }
 
+        //대기상태에서는 멋대로 돌아다닌다
+        if( owner.transform.parent == null )
+        {
+            if( Mathf.Abs(( owner.transform.position - randomPosition ).x) < 0.01f
+                && Mathf.Abs(( owner.transform.position - randomPosition ).y) < 0.01f )
+            {
+                randomPosition = new Vector3(Random.Range(-30f, 30f), 0, Random.Range(-10f, 10f));
+            }
+            owner.transform.position = Vector3.MoveTowards(owner.transform.position, randomPosition, owner.WalkSpeed);
+        }
+    }
 }

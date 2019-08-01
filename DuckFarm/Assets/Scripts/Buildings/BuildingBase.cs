@@ -4,4 +4,5 @@ using UnityEngine;
 
 public class BuildingBase : ObjectBase
 {
+    public World.BuildingType buildingType;
 }
