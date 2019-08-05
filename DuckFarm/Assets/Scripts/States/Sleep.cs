@@ -27,18 +27,24 @@ public class Sleep : State
         //노숙을 한다면
         if( closeShelter == null )
         {
+            //그자리에서 잔다
             owner.Fatigue = DecreaseTargetValue(owner.Fatigue, 3f);
-
             if( owner.Fatigue == 0 )
             {
                 owner.ChangeState(owner.stateList["Idle"]);
             }
         }
-
         //가려던 축사가 다 찼으면
         else if( !closeShelter.AskEnterable() )
         {
+            //다른 축사를 찾아본다
             closeShelter = World.GetInstance().FindEnterablePocketBuilding(owner, World.BuildingType.shelter);
+        }
+        //들어갈 수 있는 축사가 있으면
+        else
+        {
+            //축사를 향해 움직인다
+            owner.Move(closeShelter.transform.position);
         }
     }
 

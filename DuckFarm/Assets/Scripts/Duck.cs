@@ -31,7 +31,8 @@ public class Duck : ObjectBase
     {
         IncreaseTargetValue(ref hunger, currentState.HungerPace);
         IncreaseTargetValue(ref fatigue, currentState.FatiguePace);
-        IncreaseTargetValue(ref age, 0.5f);
+
+        //오리 나이를 증가시키자
 
         currentState.Update();
 
@@ -74,5 +75,19 @@ public class Duck : ObjectBase
         state.Enter();
         //현재 스테이트를 바꾸려는 스테이트로 변경
         currentState = state;
+    }
+
+    public void EatFood( Food food )
+    {
+        hunger += food.Fullness;
+        if( hunger >= 100 )
+            hunger = 100;
+
+        World.GetInstance().DuckAteFood(food);
+    }
+
+    public void Move(Vector3 destination)
+    {
+        //네비게이션 이용하자
     }
 }

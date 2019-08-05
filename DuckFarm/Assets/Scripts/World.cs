@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class World : MonoBehaviour
 {
+    public static int oneDay = 2000; //1일 = 2000 Millisecond
+    public static int reverseOneDay = oneDay / 10000;
     protected World()
     {
         _instance = this;
@@ -20,11 +22,13 @@ public class World : MonoBehaviour
 
     //public enum 건물타입
     public enum BuildingType { mainStorage, hatchery, shelter, feedFactory }
+    public enum FoodType { egg, worm, fish, feed, crop }
 
     //빌딩 리스트(key=빌딩ID/ value=gameObject)
     Dictionary<string, BuildingBase> buildingList = new Dictionary<string, BuildingBase>();
     //오리 리스트
-    Dictionary<string, GameObject> ducksList = new Dictionary<string, GameObject>();
+    Dictionary<string, Duck> ducksList = new Dictionary<string, Duck>();
+    Dictionary<string, Food> foodsList = new Dictionary<string, Food>();
 
     // 밀리세컨드 단위에 
     static long CurrentGameWorldTimeMS = 0;
@@ -111,8 +115,10 @@ public class World : MonoBehaviour
         GameObject egg = Instantiate(resource, position, Quaternion.identity) as GameObject;
 
         string objID = $"egg_{s_uniqueID++}";
-        ObjectBase objectBase = egg.GetComponent<ObjectBase>();
+        Food objectBase = egg.GetComponent<Food>();
         objectBase.ObjectID = objID;
+
+        foodsList.Add(objID, objectBase);
 
         return objectBase;
     }
@@ -124,11 +130,12 @@ public class World : MonoBehaviour
 
         GameObject duckling = Instantiate(Resources.Load("Prefabs/duck"), hatchery.transform.position, Quaternion.identity) as GameObject;
         string objectID = $"duck_{s_uniqueID++}";
-        ObjectBase objectBase = duckling.GetComponent<ObjectBase>();
+        Duck objectBase = duckling.GetComponent<Duck>();
         objectBase.ObjectID = objectID;
 
-        ducksList.Add(objectID, duckling);
+        ducksList.Add(objectID, objectBase);
 
+        foodsList.Remove(egg.ObjectID);
         GameObject.Destroy(egg.gameObject);
     }
 
@@ -137,6 +144,32 @@ public class World : MonoBehaviour
         string duckID = duck.GetComponent<ObjectBase>().ObjectID;
         ducksList.Remove(duckID);
         Debug.Log($"{duckID} : 오리가 죽었다.");
+    }
+
+    public Food ProduceFood(FoodType foodType)
+    {
+        string objID = $"{foodType.ToString()}_{s_uniqueID++}";
+
+        var resource = Resources.Load($"Prefabs/Food/{foodType.ToString()}");
+        if( resource == null )
+        {
+            Debug.Log($"{foodType.ToString()}가 없어..");
+            return null;
+        }
+
+        Food newFood = Instantiate(resource) as Food;
+
+        newFood.ObjectID = objID;
+
+        foodsList.Add(objID, newFood);
+
+        return newFood;
+    }
+
+    public void DuckAteFood(Food food)
+    {
+        foodsList.Remove(food.ObjectID);
+        GameObject.Destroy(food.gameObject);
     }
 
     //가까이에 있는 건물를 알려주자
@@ -159,6 +192,19 @@ public class World : MonoBehaviour
         }
 
         return find;
+    }
+    public BuildingBase FindMainStorage()
+    {
+        BuildingBase mainStorage = null;
+        foreach( var building in buildingList )
+        {
+            if( building.Value.buildingType == BuildingType.mainStorage )
+            {
+                mainStorage = building.Value;
+                break;
+            }
+        }
+        return mainStorage;
     }
 
     public PocketBuilding FindEnterablePocketBuilding( ObjectBase finder, BuildingType buildingType )
