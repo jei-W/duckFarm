@@ -12,7 +12,10 @@ public class Egg : Food
     //알 나이(5일이 지나면 부화불가) -> 신선도 몇 이상? (임시)60 아래 부화불가
     //먹었을 때 스트레스 수치를 증가시킨다
 
-    public Egg() : base(freshTime) { }
+    public Egg()
+    {
+        freshDecrement = 100 / freshTime;
+    }
 
     private void Update()
     {

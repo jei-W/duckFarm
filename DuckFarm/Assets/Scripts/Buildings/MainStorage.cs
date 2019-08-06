@@ -82,13 +82,32 @@ public class MainStorage : BuildingBase
     }
 
     //**(임시 테스트용)** food는 일정시간마다 하나씩 자동으로 찬다
+    long _timerID = 0;
+
+    public void Start()
+    {
+        _timerID = WorldTimer.GetInstance().RegisterTimer(World.CurrentGameWorldTimeMS + 3000, TimerCallback);
+    }
+
     public void AutoMakingFood()
     {
-        if( !FoodIsFull() )
-        {
-            WorldTimer.GetInstance().RegisterTimer()
-        }
+        var food = World.GetInstance().ProduceFood(World.FoodType.feed);
         foodList.Add(food.ObjectID, food);
         CurrentFoodCapacity++;
+
+        if( !FoodIsFull() )
+        {
+
+            _timerID = WorldTimer.GetInstance().RegisterTimer(World.CurrentGameWorldTimeMS + 3000, TimerCallback);
+        }
+    }
+
+    void TimerCallback( long timerID )
+    {
+        if( _timerID == timerID )
+        {
+            _timerID = 0;
+            AutoMakingFood();
+        }
     }
 }

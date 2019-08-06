@@ -15,7 +15,7 @@ public class Hatchery : PocketBuilding
         if( !targetEgg.hatchable )
             return;
 
-        long currentTime = System.DateTime.Now.Millisecond;
+        long currentTime = World.CurrentGameWorldTimeMS;
         targetEgg.hatchStartTime = currentTime;
         //알이 들어왔으면 알 부화 타이머를 켠다
         WorldTimer.GetInstance().RegisterTimer(currentTime + (long)targetEgg.remainingHatchTime * World.oneDay, ( long timerID ) => Hatch(targetObject.ObjectID));

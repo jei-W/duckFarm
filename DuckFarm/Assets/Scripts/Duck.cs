@@ -1,21 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Duck : ObjectBase
 {
     enum GrowthLevel { duckling, adult }
     enum WorkState { idle, sleep, work }
     bool male;
-    float age = 0;
+    float age = 0;   //단위 = 1일
+    float lifespan;
     float hunger = 0;
     float fatigue = 0;
-    public long SomethingStaetTime { get; set; }
-    public float WalkSpeed { get; } = 0.1f;
+    public long SomethingStartTime { get; set; }
     public float Hunger { get { return hunger; } set { hunger = value; } }
     public float Fatigue { get { return fatigue; } set { fatigue = value; } }
     public float Stress { get; set; } = 0;
     public State currentState;
+    NavMeshAgent agent;
 
     public Dictionary<string, State> stateList = new Dictionary<string, State>();
 
@@ -25,6 +27,9 @@ public class Duck : ObjectBase
         stateList.Add("Eat", new Eat(this));
         stateList.Add("Sleep", new Sleep(this));
         currentState = stateList["Idle"];
+        lifespan = Random.Range(1825f, 3650f); //수명은 5년~10년 사이
+
+        agent = GetComponent<NavMeshAgent>();
     }
 
     private void Update()
@@ -41,9 +46,13 @@ public class Duck : ObjectBase
             DuckDie();
             return;
         }
-    }
 
-    //void 건물에 들어갈 수 있는지 물어본다
+        if( age > lifespan )
+        {
+            DuckDie();
+            return;
+        }
+    }
 
     void DuckDie()
     {
@@ -89,5 +98,11 @@ public class Duck : ObjectBase
     public void Move(Vector3 destination)
     {
         //네비게이션 이용하자
+        agent.SetDestination(destination);
+    }
+
+    public void Sleeping()
+    {
+
     }
 }

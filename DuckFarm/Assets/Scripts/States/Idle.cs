@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Idle : State
 {
@@ -11,6 +12,7 @@ public class Idle : State
     public override void Enter()
     {
         randomPosition = owner.transform.position;
+        owner.GetComponent<NavMeshAgent>().autoBraking = false;
 
         //수치 증가속도 초기화
         hungerPace = 2f;
@@ -20,17 +22,18 @@ public class Idle : State
 
     public override void Exit()
     {
+        owner.GetComponent<NavMeshAgent>().autoBraking = true;
     }
 
     public override void Update()
     {
-        if( owner.Fatigue >= 7 )
+        if( owner.Fatigue >= 70 )
         {
             owner.ChangeState(owner.stateList["Sleep"]);
             return;
         }
 
-        if( owner.Hunger >= 7 )
+        if( owner.Hunger >= 70 )
         {
             owner.ChangeState(owner.stateList["Eat"]);
             return;
@@ -44,7 +47,7 @@ public class Idle : State
             {
                 randomPosition = new Vector3(Random.Range(-30f, 30f), 0, Random.Range(-10f, 10f));
             }
-            owner.transform.position = Vector3.MoveTowards(owner.transform.position, randomPosition, owner.WalkSpeed);
+            owner.Move(randomPosition);
         }
     }
 }

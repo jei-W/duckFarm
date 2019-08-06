@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class World : MonoBehaviour
 {
+    // 밀리세컨드 단위에 
+    public static long CurrentGameWorldTimeMS = 0;
+
     public static int oneDay = 2000; //1일 = 2000 Millisecond
     public static int reverseOneDay = oneDay / 10000;
     protected World()
@@ -30,8 +33,7 @@ public class World : MonoBehaviour
     Dictionary<string, Duck> ducksList = new Dictionary<string, Duck>();
     Dictionary<string, Food> foodsList = new Dictionary<string, Food>();
 
-    // 밀리세컨드 단위에 
-    static long CurrentGameWorldTimeMS = 0;
+
 
     void Start()
     {
@@ -106,7 +108,7 @@ public class World : MonoBehaviour
     //알 생성
     ObjectBase LayEgg( Vector3 position )
     {
-        var resource = Resources.Load("Prefabs/egg");
+        var resource = Resources.Load("Prefabs/Food/egg");
         if( resource == null )
         {
             Debug.Log("알이 없어..");
