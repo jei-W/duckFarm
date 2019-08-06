@@ -6,7 +6,7 @@ using UnityEngine.AI;
 public class Duck : ObjectBase
 {
     enum GrowthLevel { duckling, adult }
-    enum WorkState { idle, sleep, work }
+    enum WorkState { idle, sleep, eat, mating, work }
     bool male;
     float age = 0;   //단위 = 1일
     float lifespan;
@@ -26,6 +26,7 @@ public class Duck : ObjectBase
         stateList.Add("Idle", new Idle(this));
         stateList.Add("Eat", new Eat(this));
         stateList.Add("Sleep", new Sleep(this));
+        stateList.Add("Mating", new Mating(this));
         currentState = stateList["Idle"];
         lifespan = Random.Range(1825f, 3650f); //수명은 5년~10년 사이
 

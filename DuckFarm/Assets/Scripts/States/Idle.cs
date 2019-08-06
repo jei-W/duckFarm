@@ -49,5 +49,9 @@ public class Idle : State
             }
             owner.Move(randomPosition);
         }
+
+        //일정확률로 발정상태에 빠진다
+        if( Random.Range(1, 100) <= 30 )
+            owner.ChangeState(owner.stateList["Mating"]);
     }
 }
