@@ -13,10 +13,7 @@ public class Idle : State
     {
         randomPosition = owner.transform.position;
         owner.GetComponent<NavMeshAgent>().autoBraking = false;
-
-        //수치 증가속도 초기화
-        hungerPace = 2f;
-        fatiguePace = 2f;
+        
         Debug.Log("대기!");
     }
 
@@ -29,13 +26,13 @@ public class Idle : State
     {
         if( owner.Fatigue >= 70 )
         {
-            owner.ChangeState(owner.stateList["Sleep"]);
+            owner.ChangeState("Sleep");
             return;
         }
 
         if( owner.Hunger >= 70 )
         {
-            owner.ChangeState(owner.stateList["Eat"]);
+            owner.ChangeState("Eat");
             return;
         }
 
@@ -52,6 +49,6 @@ public class Idle : State
 
         //일정확률로 발정상태에 빠진다
         if( Random.Range(1, 100) <= 30 )
-            owner.ChangeState(owner.stateList["Mating"]);
+            owner.ChangeState("Mating");
     }
 }

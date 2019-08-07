@@ -33,7 +33,7 @@ public class Eat : State
 
         if( owner.Hunger <= 30 )
         {
-            owner.ChangeState(owner.stateList["Idle"]);
+            owner.ChangeState("Idle");
         }
     }
 }

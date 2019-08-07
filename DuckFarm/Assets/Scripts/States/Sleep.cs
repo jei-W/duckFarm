@@ -50,7 +50,7 @@ public class Sleep : State
             //땅바닥이던 축사던, 잔다
             owner.Sleeping(currentState);
             //랜덤시간 타이머 등록
-            WorldTimer.GetInstance().RegisterTimer(World.CurrentGameWorldTimeMS + (int)sleepTime, ( _TimerID ) => owner.ChangeState(owner.stateList["idle"]));
+            WorldTimer.GetInstance().RegisterTimer(World.CurrentGameWorldTimeMS + (int)sleepTime, ( _TimerID ) => owner.ChangeState("idle"));
         }
         else if( currentState == "goingToShelter" )
         {

@@ -18,7 +18,7 @@ public class Duck : ObjectBase
     public State currentState;
     NavMeshAgent agent;
 
-    public Dictionary<string, State> stateList = new Dictionary<string, State>();
+    private Dictionary<string, State> stateList = new Dictionary<string, State>();
 
     private void Start()
     {
@@ -26,7 +26,9 @@ public class Duck : ObjectBase
         stateList.Add("Eat", new Eat(this));
         stateList.Add("Sleep", new Sleep(this));
         stateList.Add("Mating", new Mating(this));
-        currentState = stateList["Idle"];
+
+        ChangeState("Idle");
+
         lifespan = Random.Range(1825f, 3650f); //수명은 5년~10년 사이
 
         agent = GetComponent<NavMeshAgent>();
@@ -67,6 +69,16 @@ public class Duck : ObjectBase
 
         figure += Time.deltaTime * expirationTime * World.reverseOneDay;
         return figure;
+    }
+
+    public void ChangeState(string stateName)
+    {
+        if ( stateList.ContainsKey(stateName) )
+        {
+            ChangeState(stateList[stateName]);
+        }
+
+        Debug.LogError($"존재하지 않는 오리의 상태 : {stateName}");
     }
 
     public void ChangeState(State state)

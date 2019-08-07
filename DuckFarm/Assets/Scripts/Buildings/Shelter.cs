@@ -16,6 +16,6 @@ public class Shelter : PocketBuilding
         //오리가 언제까지 잘지 정하고
         int sleepingTime = (int)Random.Range(World.oneDay * 0.25f, World.oneDay * 0.3f);
         //타이머를 맞추자
-        WorldTimer.GetInstance().RegisterTimer(currentTime + sleepingTime, ( timerID ) => targetDuck.ChangeState(targetDuck.stateList["Idle"]));
+        WorldTimer.GetInstance().RegisterTimer(currentTime + sleepingTime, ( timerID ) => targetDuck.ChangeState("Idle"));
     }
 }
