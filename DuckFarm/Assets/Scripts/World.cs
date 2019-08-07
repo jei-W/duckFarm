@@ -58,7 +58,7 @@ public class World : MonoBehaviour
         //부화장 생성
         PocketBuilding hatch = BuildBuilding(BuildingType.hatchery, new Vector3(3, 0, 3)) as PocketBuilding;
         //축사 생성
-        PocketBuilding shelter1 = BuildBuilding(BuildingType.shelter, new Vector3(-3, 0, 3)) as PocketBuilding;
+        PocketBuilding shelter1 = BuildBuilding(BuildingType.shelter, new Vector3(1, 0, 2)) as PocketBuilding;
         PocketBuilding shelter2 = BuildBuilding(BuildingType.shelter, new Vector3(3, 0, -3)) as PocketBuilding;
 
 
@@ -134,6 +134,7 @@ public class World : MonoBehaviour
         string objectID = $"duck_{s_uniqueID++}";
         Duck objectBase = duckling.GetComponent<Duck>();
         objectBase.ObjectID = objectID;
+        duckling.name = objectID;
 
         ducksList.Add(objectID, objectBase);
 
