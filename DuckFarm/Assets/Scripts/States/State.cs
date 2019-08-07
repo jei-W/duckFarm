@@ -5,10 +5,9 @@ using UnityEngine;
 public class State
 {
     protected Duck owner;
-    protected float hungerPace = 2f;
-    protected float fatiguePace = 2f;
-    public float HungerPace { get { return hungerPace; } }
-    public float FatiguePace { get { return fatiguePace; } }
+    //하루동안 변화하는 양
+    public float hungerChangeValue = 40f;
+    public float fatigueChangeValue = 40f;
 
     public State( Duck duck )
     {
@@ -27,5 +26,7 @@ public class State
 
     public virtual void Update()
     {
+        owner.Hunger = owner.ChangeTargetValue(owner.Hunger, hungerChangeValue); 
+        owner.Fatigue = owner.ChangeTargetValue(owner.Fatigue, fatigueChangeValue);
     }
 }

@@ -10,11 +10,10 @@ public class Duck : ObjectBase
     bool male;
     float age = 0;   //단위 = 1일
     float lifespan;
-    float hunger = 0;
-    float fatigue = 0;
+
     public long SomethingStartTime { get; set; }
-    public float Hunger { get { return hunger; } set { hunger = value; } }
-    public float Fatigue { get { return fatigue; } set { fatigue = value; } }
+    public float Hunger { get; set; } = 0;
+    public float Fatigue { get; set; } = 0;
     public float Stress { get; set; } = 0;
     public State currentState;
     NavMeshAgent agent;
@@ -35,14 +34,11 @@ public class Duck : ObjectBase
 
     private void Update()
     {
-        IncreaseTargetValue(ref hunger, currentState.HungerPace);
-        IncreaseTargetValue(ref fatigue, currentState.FatiguePace);
-
         //오리 나이를 증가시키자
 
         currentState.Update();
 
-        if( Hunger > 100 || fatigue > 10 )
+        if( Hunger > 100 || Fatigue > 10 )
         {
             DuckDie();
             return;
@@ -62,15 +58,15 @@ public class Duck : ObjectBase
         GameObject.Destroy(this);
     }
 
-    public int IncreaseTargetValue( ref float figure, float expirationTime )
+    public float ChangeTargetValue( float figure, float expirationTime )
     {
-        if( figure > 10 )
-        {
-            return 10;
-        }
+        if( figure >= 10 )
+            return 10f;
+        else if( figure <= 0 )
+            return 0f;
 
-        figure += Time.deltaTime * expirationTime;
-        return (int)figure;
+        figure += Time.deltaTime * expirationTime * World.reverseOneDay;
+        return figure;
     }
 
     public void ChangeState(State state)
@@ -89,9 +85,9 @@ public class Duck : ObjectBase
 
     public void EatFood( Food food )
     {
-        hunger += food.Fullness;
-        if( hunger >= 100 )
-            hunger = 100;
+        Hunger += food.Fullness;
+        if( Hunger >= 100 )
+            Hunger = 100;
 
         World.GetInstance().DuckAteFood(food);
     }
@@ -102,8 +98,20 @@ public class Duck : ObjectBase
         agent.SetDestination(destination);
     }
 
-    public void Sleeping()
+    public void Sleeping(string state)
     {
+        Debug.Log("zz..");
 
+        switch( state )
+        {
+            case "sleepGround":
+                currentState.hungerChangeValue = 30f;
+                currentState.fatigueChangeValue = -25f;
+                break;
+            case "sleepShelter":
+                currentState.hungerChangeValue = 0f;
+                currentState.fatigueChangeValue = -40f;
+                break;
+        }
     }
 }
