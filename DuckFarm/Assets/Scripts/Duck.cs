@@ -64,7 +64,7 @@ public class Duck : ObjectBase
     {
         if( figure >= 10 )
             return 10f;
-        else if( figure <= 0 )
+        else if( figure < 0 )
             return 0f;
 
         figure += Time.deltaTime * expirationTime * World.reverseOneDay;
