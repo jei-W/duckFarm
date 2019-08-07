@@ -24,6 +24,8 @@ public class Idle : State
 
     public override void Update()
     {
+        base.Update();
+
         if( owner.Fatigue >= 70 )
         {
             owner.ChangeState("Sleep");

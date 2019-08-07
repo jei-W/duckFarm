@@ -88,6 +88,7 @@ public class Duck : ObjectBase
         if( currentState == state )
             return;
 
+        Debug.Log($"{gameObject.name}의 상태 변경 : {state.ToString()}");
         //현재 스테이트의 Exit를 호출
         if( currentState != null )
             currentState.Exit();
