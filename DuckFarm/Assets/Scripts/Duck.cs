@@ -77,8 +77,10 @@ public class Duck : ObjectBase
         {
             ChangeState(stateList[stateName]);
         }
-
-        Debug.LogError($"존재하지 않는 오리의 상태 : {stateName}");
+        else
+        {
+            Debug.LogError($"존재하지 않는 오리의 상태 : {stateName}");
+        }
     }
 
     public void ChangeState(State state)
