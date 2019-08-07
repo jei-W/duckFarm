@@ -9,7 +9,7 @@ public class World : MonoBehaviour
     public static long CurrentGameWorldTimeMS = 0;
 
     public static int oneDay = 2000; //1일 = 2000 Millisecond
-    public static int reverseOneDay = oneDay / 10000;
+    public static int reverseOneDay = 1000 / oneDay;
     protected World()
     {
         _instance = this;
