@@ -37,10 +37,11 @@ public class Duck : ObjectBase
     private void Update()
     {
         //오리 나이를 증가시키자
+        Debug.Log($"배고픔:{Hunger} / 피곤:{Fatigue}");
 
         currentState.Update();
 
-        if( Hunger > 100 || Fatigue > 10 )
+        if( Hunger > 100 || Fatigue > 100 )
         {
             DuckDie();
             return;
@@ -62,8 +63,8 @@ public class Duck : ObjectBase
 
     public float ChangeTargetValue( float figure, float expirationTime )
     {
-        if( figure >= 10 )
-            return 10f;
+        if( figure >= 100 )
+            return figure;
         else if( figure < 0 )
             return 0f;
 
@@ -110,12 +111,16 @@ public class Duck : ObjectBase
     public void Move(Vector3 destination)
     {
         //네비게이션 이용하자
+        agent.isStopped = true;
         agent.SetDestination(destination);
+        agent.isStopped = false;
     }
 
     public void Sleeping(string state)
     {
-        Debug.Log("zz..");
+        Debug.Log($"{ObjectID} :zz..");
+        if( !agent.isStopped )
+            agent.isStopped = true;
 
         switch( state )
         {

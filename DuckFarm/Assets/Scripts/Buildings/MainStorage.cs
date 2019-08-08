@@ -94,6 +94,7 @@ public class MainStorage : BuildingBase
         var food = World.GetInstance().ProduceFood(World.FoodType.feed);
         foodList.Add(food.ObjectID, food);
         CurrentFoodCapacity++;
+        Debug.Log("밥생깅");
 
         if( !FoodIsFull() )
         {

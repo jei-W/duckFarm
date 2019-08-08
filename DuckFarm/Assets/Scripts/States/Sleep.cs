@@ -23,6 +23,7 @@ public class Sleep : State
         {
             currentState = "goingToShelter";
             destination = closeShelter.transform.position;
+            owner.Move(destination);
         }
         else
         {
@@ -48,9 +49,10 @@ public class Sleep : State
         if( currentState == "sleepGround" || currentState == "sleepShelter" )
         {
             //땅바닥이던 축사던, 잔다
+            ownerAgent.isStopped = true;
             owner.Sleeping(currentState);
             //랜덤시간 타이머 등록
-            WorldTimer.GetInstance().RegisterTimer(World.CurrentGameWorldTimeMS + (int)sleepTime, ( _TimerID ) => owner.ChangeState("idle"));
+            WorldTimer.GetInstance().RegisterTimer(World.CurrentGameWorldTimeMS + (int)sleepTime, ( _TimerID ) => owner.ChangeState("Idle"));
         }
         else if( currentState == "goingToShelter" )
         {
@@ -65,15 +67,19 @@ public class Sleep : State
             {
                 //다른 축사를 찾아본다
                 closeShelter = World.GetInstance().FindEnterablePocketBuilding(owner, World.BuildingType.shelter);
+                if( closeShelter != null )
+                {
+                    destination = closeShelter.transform.position;
+                    owner.Move(destination);
+                }
             }
-            else if( ( owner.transform.position - destination ).sqrMagnitude < 0.1f )
+            else if( ownerAgent.remainingDistance < 0.01f )
             {
                 //축사에 도착했따, 
                 closeShelter.EnterObject(owner);
                 currentState = "sleepShelter";
             }
 
-            owner.Move(destination);
         }
     }
 }
