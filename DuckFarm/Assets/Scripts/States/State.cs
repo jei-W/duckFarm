@@ -27,6 +27,11 @@ public class State
         
     }
 
+    public virtual void FixedUpdate()
+    {
+
+    }
+
     public virtual void Update()
     {
         owner.Hunger = owner.ChangeTargetValue(owner.Hunger, hungerChangeValue); 

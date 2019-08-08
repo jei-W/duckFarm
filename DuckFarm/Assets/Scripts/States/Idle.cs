@@ -30,7 +30,8 @@ public class Idle : State
         //대기상태에서는 멋대로 돌아다닌다
         if( owner.transform.parent == null )
         {
-            if( ownerAgent.remainingDistance < 0.01f )
+            // 이거.. 0.01f 좀 위험한뎅, 충돌나서.. 실제 거리는 엄청 멀텐뎅.
+            if( ownerAgent.remainingDistance < 0.1f )
             {
                 randomPosition = RandomPosition();
                 owner.Move(randomPosition);

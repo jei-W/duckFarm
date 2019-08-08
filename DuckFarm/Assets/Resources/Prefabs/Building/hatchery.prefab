@@ -123,6 +123,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buildingType: 0
+  Door: {fileID: 0}
 --- !u!208 &2455240990520078032
 NavMeshObstacle:
   m_ObjectHideFlags: 0

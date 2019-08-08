@@ -8,7 +8,7 @@ public class World : MonoBehaviour
     // 밀리세컨드 단위에 
     public static long CurrentGameWorldTimeMS = 0;
 
-    public static int oneDay = 2000; //1일 = 2000 Millisecond
+    public static int oneDay = 10000; //1일 = 2000 Millisecond
     public static float reverseOneDay = 1000.0f / oneDay;
     protected World()
     {
@@ -66,10 +66,10 @@ public class World : MonoBehaviour
         {
             //알 2개 생성(성별 다름)
             var egg1 = LayEgg(Vector3.zero);
-            var egg2 = LayEgg(Vector3.zero);
+           // var egg2 = LayEgg(Vector3.zero);
 
             hatch.EnterObject(egg1);
-            hatch.EnterObject(egg2);
+            //hatch.EnterObject(egg2);
         }
         else
         {
