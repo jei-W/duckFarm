@@ -34,13 +34,25 @@ public class Duck : ObjectBase
         agent = GetComponent<NavMeshAgent>();
     }
 
+    private void FixedUpdate()
+    {
+        currentState?.FixedUpdate();
+    }
+
+    // 너무 로그가 많이 떠서...
+    long tempLastTime = 0;
     private void Update()
     {
         //오리 나이를 증가시키자
+        if ( World.CurrentGameWorldTimeMS/1000 != tempLastTime )
+        {
+            Debug.Log($"{ObjectID} {currentState.ToString()} 배고픔:{Hunger} / 피곤:{Fatigue}");
+            tempLastTime = World.CurrentGameWorldTimeMS / 1000;
+        }
 
-        currentState.Update();
+        currentState?.Update();
 
-        if( Hunger > 100 || Fatigue > 10 )
+        if( Hunger > 100 || Fatigue > 100 )
         {
             DuckDie();
             return;
@@ -57,13 +69,13 @@ public class Duck : ObjectBase
     {
         Debug.Log($"{ObjectID} : 꽥!");
         World.GetInstance().OnDuckDied(this.gameObject);
-        GameObject.Destroy(this);
+        GameObject.Destroy(this.gameObject);
     }
 
     public float ChangeTargetValue( float figure, float expirationTime )
     {
-        if( figure >= 10 )
-            return 10f;
+        if( figure >= 100 )
+            return figure;
         else if( figure < 0 )
             return 0f;
 
@@ -109,13 +121,18 @@ public class Duck : ObjectBase
 
     public void Move(Vector3 destination)
     {
+        Debug.Log($"??? 중복호출? {destination}");
         //네비게이션 이용하자
+        agent.isStopped = true;
         agent.SetDestination(destination);
+        agent.isStopped = false;
     }
 
     public void Sleeping(string state)
     {
-        Debug.Log("zz..");
+        Debug.Log($"{ObjectID} :zz..");
+        if( !agent.isStopped )
+            agent.isStopped = true;
 
         switch( state )
         {

@@ -11,7 +11,7 @@ public class Idle : State
 
     public override void Enter()
     {
-        randomPosition = owner.transform.position;
+        randomPosition = RandomPosition();
         owner.GetComponent<NavMeshAgent>().autoBraking = false;
         
         Debug.Log("대기!");
@@ -20,13 +20,25 @@ public class Idle : State
     public override void Exit()
     {
         owner.GetComponent<NavMeshAgent>().autoBraking = true;
+        //ownerAgent.isStopped = true;
     }
 
     public override void Update()
     {
         base.Update();
 
-        if( owner.Fatigue >= 70 )
+        //대기상태에서는 멋대로 돌아다닌다
+        if( owner.transform.parent == null )
+        {
+            // 이거.. 0.01f 좀 위험한뎅, 충돌나서.. 실제 거리는 엄청 멀텐뎅.
+            if( ownerAgent.remainingDistance < 0.1f )
+            {
+                randomPosition = RandomPosition();
+                owner.Move(randomPosition);
+            }
+        }
+
+        if( owner.Fatigue >= 60 )
         {
             owner.ChangeState("Sleep");
             return;
@@ -38,19 +50,22 @@ public class Idle : State
             return;
         }
 
-        //대기상태에서는 멋대로 돌아다닌다
-        if( owner.transform.parent == null )
-        {
-            if( Mathf.Abs(( owner.transform.position - randomPosition ).x) < 0.01f
-                && Mathf.Abs(( owner.transform.position - randomPosition ).y) < 0.01f )
-            {
-                randomPosition = new Vector3(Random.Range(-30f, 30f), 0, Random.Range(-10f, 10f));
-            }
-            owner.Move(randomPosition);
-        }
-
         //일정확률로 발정상태에 빠진다
-        if( Random.Range(1, 100) <= 30 )
-            owner.ChangeState("Mating");
+        //if( Random.Range(1, 100) <= 30 )
+        //    owner.ChangeState("Mating");
+    }
+
+    Vector3 RandomPosition()
+    {
+        float radius = 3f;
+        Vector3 randomDirection = Random.insideUnitSphere * radius;
+        randomDirection += owner.transform.position;
+        NavMeshHit hit;
+        Vector3 finalPosition = Vector3.zero;
+        if( NavMesh.SamplePosition(randomDirection, out hit, radius, 1) )
+        {
+            finalPosition = hit.position;
+        }
+        return finalPosition;
     }
 }

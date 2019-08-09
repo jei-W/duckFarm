@@ -60,19 +60,28 @@ public class WorldTimer
     {
         long currentWorldTime = time;
 
-        List<long> reserveToDeleteTimerList = new List<long>();
+        List<TimerData> reserveToDeleteTimerList = new List<TimerData>();
         foreach( var timer in _timer )
         {
             if( timer.Value.Time <= currentWorldTime )
             {
-                timer.Value.Callback?.Invoke(timer.Value.TimerID);
-                reserveToDeleteTimerList.Add(timer.Key);
+                // 이곳에서 timer의 callback을 호출하지 않는 이유..
+                // timer의 callback을 처리하는 과정에서 _timer의 데이터가 변하는 일이 발생할 경우가 있음
+                // 가령 State가 변화면서 Exit()에서 타이머를 정리한다던가..
+                reserveToDeleteTimerList.Add(timer.Value);
             }
         }
 
-        foreach( var id in reserveToDeleteTimerList )
+        // 해서, 여기서 먼저 timer들을 지우고,
+        foreach( var timer in reserveToDeleteTimerList )
         {
-            _timer.Remove(id);
+            _timer.Remove(timer.TimerID);
+        }
+
+        // 콜백을 안전하게 호출한다.
+        foreach( var timer in reserveToDeleteTimerList )
+        {
+            timer.Callback?.Invoke(timer.TimerID);
         }
     }
 }
