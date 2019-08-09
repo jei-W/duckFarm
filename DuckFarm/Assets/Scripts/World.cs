@@ -160,7 +160,8 @@ public class World : MonoBehaviour
             return null;
         }
 
-        Food newFood = Instantiate(resource) as Food;
+        var newObj = Instantiate(resource) as GameObject;
+        var newFood = newObj.GetComponent<Food>();
 
         newFood.ObjectID = objID;
 

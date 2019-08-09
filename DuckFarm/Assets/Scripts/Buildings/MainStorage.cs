@@ -19,8 +19,8 @@ public class MainStorage : BuildingBase
     public bool FoodIsFull()
     {
         if( MaximumFoodCapacity <= CurrentFoodCapacity )
-            return false;
-        else return true;
+            return true;
+        else return false;
     }
 
     public bool MaterialIsFull()
@@ -56,6 +56,13 @@ public class MainStorage : BuildingBase
             //case Material mat:
             //break;
         }
+
+        targetObject.transform.parent = this.transform;
+        var meshRenderer = targetObject.GetComponentInChildren<MeshRenderer>() as MeshRenderer;
+        if( meshRenderer != null )
+        {
+            meshRenderer.enabled = false;
+        }
     }
 
     //꺼내기 메소드
@@ -78,6 +85,13 @@ public class MainStorage : BuildingBase
 
         if( foodKey != null )
             foodList.Remove(foodKey);
+
+        foodValue.transform.parent = null;
+        var meshRenderer = foodValue.GetComponentInChildren<MeshRenderer>() as MeshRenderer;
+        if( meshRenderer != null )
+        {
+            meshRenderer.enabled = true;
+        }
         return foodValue;
     }
 
@@ -92,8 +106,7 @@ public class MainStorage : BuildingBase
     public void AutoMakingFood()
     {
         var food = World.GetInstance().ProduceFood(World.FoodType.feed);
-        foodList.Add(food.ObjectID, food);
-        CurrentFoodCapacity++;
+        SaveObject(food);
         Debug.Log("밥생깅");
 
         if( !FoodIsFull() )
