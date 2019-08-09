@@ -5,7 +5,7 @@ using UnityEngine;
 public class Eat : State
 {
     Food targetFood;
-    BuildingBase restaurant;
+    IFoodConsumeableBuilding restaurant;
     string currentState = "";
      
     public Eat( Duck duck ) : base(duck) { }
@@ -15,7 +15,8 @@ public class Eat : State
         Debug.Log("배고파!");
 
         //1순위- 사료공장, 2순위- 저장소, 3순위- 완료된 작물, 4순위- 물고기and지렁이
-        restaurant = World.GetInstance().FindCloseBuilding(owner, World.BuildingType.feedFactory);
+        restaurant = World.GetInstance().FindCloseBuilding(owner, World.BuildingType.feedFactory) as IFoodConsumeableBuilding;
+        ChangeEatingState("goingToRestaurant");
     }
 
     public override void Exit()
@@ -24,7 +25,6 @@ public class Eat : State
 
     public override void Update()
     {
-        ChangeEatingState("goingToRestaurant");
 
         if( owner.Hunger <= 30 )
         {
@@ -57,17 +57,20 @@ public class Eat : State
             case "goingToRestaurant":
                 //if(restaurant is FeedFactory && restaurant.IsEmpty )
                 //레스토랑이 사료공장인데, 사료가 없으면 다른 사료공장을 찾는다
-
-                if( restaurant == null ) //저장소에 식량이 없는경우의 조건도 추가하자
+                Vector3 destination = Vector3.zero;
+                if( restaurant == null || restaurant.FoodIsEmpty() )
                 {
-                    restaurant = World.GetInstance().FindMainStorage();
+                    var building = World.GetInstance().FindMainStorage();
+                    destination = building.transform.position;
+                    restaurant = building as IFoodConsumeableBuilding;
                 }
-                owner.Move(restaurant.transform.position);
+                owner.Move(destination);
                 break;
             case "EatingAtRestaurant":
-                if( restaurant is MainStorage )
-                    targetFood = restaurant.GetComponent<MainStorage>().GetFood();
+                Debug.Log("냠냠");
+                targetFood = restaurant.GetFood();
                 owner.EatFood(targetFood);
+                owner.ChangeState("Idle");
                 break;
             case "EatingSomething":
                 break;

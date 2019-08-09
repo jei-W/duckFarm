@@ -112,9 +112,9 @@ public class Duck : ObjectBase
 
     public void EatFood( Food food )
     {
-        Hunger += food.Fullness;
-        if( Hunger >= 100 )
-            Hunger = 100;
+        Hunger -= food.Fullness;
+        if( Hunger <= 0 )
+            Hunger = 0;
 
         World.GetInstance().DuckAteFood(food);
     }

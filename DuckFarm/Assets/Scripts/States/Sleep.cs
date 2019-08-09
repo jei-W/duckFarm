@@ -38,8 +38,8 @@ public class Sleep : State
     public override void Exit()
     {
         //초기값으로 셋팅
-        hungerChangeValue = 40f;
-        fatigueChangeValue = 40f;
+        hungerChangeValue = 30f;
+        fatigueChangeValue = 30f;
 
         //타이머 등록해제
         if( wakeUpTimer != 0 )

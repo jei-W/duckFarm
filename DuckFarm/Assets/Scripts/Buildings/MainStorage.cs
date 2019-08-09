@@ -2,18 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MainStorage : BuildingBase
+public class MainStorage : BuildingBase, IFoodConsumeableBuilding, IResourceConsumeableBuilding
 {
     //food 최대 저장량, 현재 저장량
     int MaximumFoodCapacity = 5;
     int CurrentFoodCapacity = 0;
     //자원 최대 저장량, 현재 저장량
-    int MaximumMatCapacity = 10;
-    int CurrentMatCapacity = 0;
+    int MaximumResCapacity = 10;
+    int CurrentResCapacity = 0;
 
     //Food 저장 리스트
     Dictionary<string, Food> foodList = new Dictionary<string, Food>();
     //자원 저장 리스트
+    Dictionary<string, Resource> resourceList = new Dictionary<string, Resource>();
+
 
     //(bool) is full? 메소드
     public bool FoodIsFull()
@@ -23,9 +25,9 @@ public class MainStorage : BuildingBase
         else return false;
     }
 
-    public bool MaterialIsFull()
+    public bool ResourceIsFull()
     {
-        if( MaximumMatCapacity <= CurrentMatCapacity )
+        if( MaximumResCapacity <= CurrentResCapacity )
             return false;
         else return true;
     }
@@ -37,25 +39,30 @@ public class MainStorage : BuildingBase
         else return false;
     }
 
-    public bool MaterialIsEmpty()
+    public bool ResourceIsEmpty()
     {
-        if( CurrentMatCapacity == 0 )
+        if( CurrentResCapacity == 0 )
             return true;
         else return false;
     }
 
     //저장 메소드
-    public void SaveObject(ObjectBase targetObject)
+    public void InputFood(Food targetObject)
     {
-        switch(targetObject)
+        foodList.Add(targetObject.ObjectID, targetObject);
+        CurrentFoodCapacity++;
+
+        targetObject.transform.parent = this.transform;
+        var meshRenderer = targetObject.GetComponentInChildren<MeshRenderer>() as MeshRenderer;
+        if( meshRenderer != null )
         {
-            case Food food:
-                foodList.Add(food.ObjectID, food);
-                CurrentFoodCapacity++;
-                break;
-            //case Material mat:
-            //break;
+            meshRenderer.enabled = false;
         }
+    }
+    public void InputResource( Resource targetObject )
+    {
+        resourceList.Add(targetObject.ObjectID, targetObject);
+        CurrentResCapacity++;
 
         targetObject.transform.parent = this.transform;
         var meshRenderer = targetObject.GetComponentInChildren<MeshRenderer>() as MeshRenderer;
@@ -95,6 +102,34 @@ public class MainStorage : BuildingBase
         return foodValue;
     }
 
+    public Resource GetResource( World.ResourceType type )
+    {
+        string resourceKey = null;
+        Resource resourceValue = null;
+
+        foreach( var resource in resourceList )
+        {
+            if( resource.Value.type == type )
+            {
+                resourceKey = resource.Key;
+                resourceValue = resource.Value;
+                break;
+            }
+        }
+
+        if( resourceKey != null )
+            resourceList.Remove(resourceKey);
+
+        resourceValue.transform.parent = null;
+        var meshRenderer = resourceValue.GetComponentInChildren<MeshRenderer>() as MeshRenderer;
+        if( meshRenderer != null )
+        {
+            meshRenderer.enabled = true;
+        }
+        return resourceValue;
+    }
+
+
     //**(임시 테스트용)** food는 일정시간마다 하나씩 자동으로 찬다
     long _timerID = 0;
 
@@ -106,7 +141,7 @@ public class MainStorage : BuildingBase
     public void AutoMakingFood()
     {
         var food = World.GetInstance().ProduceFood(World.FoodType.feed);
-        SaveObject(food);
+        InputFood(food);
         Debug.Log("밥생깅");
 
         if( !FoodIsFull() )

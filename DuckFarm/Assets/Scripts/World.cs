@@ -26,6 +26,8 @@ public class World : MonoBehaviour
     //public enum 건물타입
     public enum BuildingType { mainStorage, hatchery, shelter, feedFactory }
     public enum FoodType { egg, worm, fish, feed, crop }
+    public enum ResourceType { wood, stone }
+
 
     //빌딩 리스트(key=빌딩ID/ value=gameObject)
     Dictionary<string, BuildingBase> buildingList = new Dictionary<string, BuildingBase>();
