@@ -62,8 +62,7 @@ public class World : MonoBehaviour
         //축사 생성
         PocketBuilding shelter1 = BuildBuilding(BuildingType.shelter, new Vector3(1, 0, 2)) as PocketBuilding;
         PocketBuilding shelter2 = BuildBuilding(BuildingType.shelter, new Vector3(3, 0, -3)) as PocketBuilding;
-
-
+        
         if( hatch != null )
         {
             //알 2개 생성(성별 다름)
@@ -81,7 +80,7 @@ public class World : MonoBehaviour
 
     //건물생성함수(건물타입, 생성위치) : 매개변수를 토대로 프리팹을 가져와서 인스턴스화 한다
     //건물생성함수는 빌딩ID("건물타입_시간")를 생성한다
-    BuildingBase BuildBuilding( BuildingType type, Vector3 position )
+    public BuildingBase BuildBuilding( BuildingType type, Vector3 position )
     {
         // 이 때의 시간은 WorldTime이 아닌, 
         // Unix time stamp를 써야한다. 
@@ -105,6 +104,20 @@ public class World : MonoBehaviour
         return objectBase;
     }
 
+    // 사전 설치 오브젝트 생성.. 반투명하게 하고시픈뎅..
+    public Transform BuildPreInstallBuilding( BuildingType type )
+    {
+        var resource = Resources.Load($"Prefabs/Building/{type.ToString()}_preInstall");
+        if ( resource == null )
+        {
+            Debug.Log($"{type.ToString()}가 없어..");
+            return null;
+        }
+
+        GameObject building = Instantiate(resource) as GameObject;
+
+        return building.GetComponent<Transform>();
+    }
     //환경 오브젝트 생성??
 
     //알 생성
