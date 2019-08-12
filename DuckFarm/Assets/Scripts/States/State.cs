@@ -17,7 +17,9 @@ public class State
         ownerAgent = owner.GetComponent<NavMeshAgent>();
     }
 
-    public virtual void Enter()
+    // extraData : State가 시작할 때, 필요한 정보가 있다면 넘긴다.
+    // 각 스테이트에서 알아서 추론해서 사용할 것,
+    public virtual void Enter( object extraData = null)
     {
         
     }

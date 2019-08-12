@@ -24,7 +24,7 @@ public class World : MonoBehaviour
     }
 
     //public enum 건물타입
-    public enum BuildingType { mainStorage, hatchery, shelter, feedFactory }
+    public enum BuildingType { mainStorage, hatchery, shelter, feedFactory, pond }
     public enum FoodType { egg, worm, fish, feed, crop }
     public enum ResourceType { wood, stone }
 
@@ -35,11 +35,18 @@ public class World : MonoBehaviour
     Dictionary<string, Duck> ducksList = new Dictionary<string, Duck>();
     Dictionary<string, Food> foodsList = new Dictionary<string, Food>();
 
-
+    // 일거리 타입
+    public enum JobType
+    {
+        CatchFinshInPond, // 연못에서 물고기 잡기
+    }
+    Dictionary<JobType, Queue<JobInfo>> jobs = new Dictionary<JobType, Queue<JobInfo>>();
 
     void Start()
     {
         CreateNewGame();
+
+        jobs.Add(JobType.CatchFinshInPond, new Queue<JobInfo>());
     }
 
     // 스크립트 실행 순서에서 항상 World가 먼저 실행되도록 설정하여야 한다.
@@ -58,19 +65,19 @@ public class World : MonoBehaviour
         //중앙창고건물 생성
         BuildBuilding(BuildingType.mainStorage, Vector3.zero);
         //부화장 생성
-        PocketBuilding hatch = BuildBuilding(BuildingType.hatchery, new Vector3(3, 0, 3)) as PocketBuilding;
+        PocketBuilding hatch = BuildBuilding(BuildingType.hatchery, new Vector3(6.5f, 0, 6.5f)) as PocketBuilding;
         //축사 생성
-        PocketBuilding shelter1 = BuildBuilding(BuildingType.shelter, new Vector3(1, 0, 2)) as PocketBuilding;
-        PocketBuilding shelter2 = BuildBuilding(BuildingType.shelter, new Vector3(3, 0, -3)) as PocketBuilding;
+        PocketBuilding shelter1 = BuildBuilding(BuildingType.shelter, new Vector3(-4, 0, 4.5f)) as PocketBuilding;
+        PocketBuilding shelter2 = BuildBuilding(BuildingType.shelter, new Vector3(4, 0, -4.5f)) as PocketBuilding;
         
         if( hatch != null )
         {
             //알 2개 생성(성별 다름)
             var egg1 = LayEgg(Vector3.zero);
-           // var egg2 = LayEgg(Vector3.zero);
+            var egg2 = LayEgg(Vector3.zero);
 
             hatch.EnterObject(egg1);
-            //hatch.EnterObject(egg2);
+            hatch.EnterObject(egg2);
         }
         else
         {
@@ -248,4 +255,33 @@ public class World : MonoBehaviour
 
         return find;
     }
+
+    #region Job Queue
+
+    public void RequestCatchFish( BuildingBase pond )
+    {
+        jobs[JobType.CatchFinshInPond].Enqueue(new JobInfo()
+        {
+            targetBuilding = pond
+        });
+    }
+
+    public bool IsJobEmpty(JobType type)
+    {
+        return jobs[type].Count == 0;
+    }
+
+    public JobInfo GetFirstJob(JobType type)
+    {
+        if ( jobs[type].Count == 0 )
+            return null;
+
+        return jobs[type].Dequeue();
+    }
+    #endregion
+}
+
+public class JobInfo
+{
+    public BuildingBase targetBuilding = null;
 }

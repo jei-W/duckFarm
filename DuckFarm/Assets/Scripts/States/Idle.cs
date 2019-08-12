@@ -9,7 +9,7 @@ public class Idle : State
 
     public Idle( Duck duck ) : base(duck) { }
 
-    public override void Enter()
+    public override void Enter( object extraData = null )
     {
         randomPosition = RandomPosition();
         owner.GetComponent<NavMeshAgent>().autoBraking = false;
@@ -17,7 +17,7 @@ public class Idle : State
         Debug.Log("대기!");
     }
 
-    public override void Exit()
+    public override void Exit( )
     {
         owner.GetComponent<NavMeshAgent>().autoBraking = true;
         //ownerAgent.isStopped = true;
@@ -30,15 +30,32 @@ public class Idle : State
         //대기상태에서는 멋대로 돌아다닌다
         if( owner.transform.parent == null )
         {
+            bool somethingWorking = false;
+            // 일감의 우선순위가 없으므로.. 일단 물고기 잡는 일이 들어와 있는지 확인 해보자
+            if ( World.GetInstance().IsJobEmpty(World.JobType.CatchFinshInPond) == false )
+            {
+                // 물고기 캐러 가자
+                JobInfo job = World.GetInstance().GetFirstJob(World.JobType.CatchFinshInPond);
+                if ( job == null )
+                {
+                }
+                else
+                {
+                    owner.ChangeState("Fishing", job.targetBuilding);
+                    somethingWorking = true;
+                }
+            }
+
             // 이거.. 0.01f 좀 위험한뎅, 충돌나서.. 실제 거리는 엄청 멀텐뎅.
-            if( ownerAgent.remainingDistance < 0.1f )
+            if ( somethingWorking == false && ownerAgent.remainingDistance < 0.1f )
             {
                 randomPosition = RandomPosition();
                 owner.Move(randomPosition);
             }
+
         }
 
-        if( owner.Fatigue >= 60 )
+        if ( owner.Fatigue >= 60 )
         {
             owner.ChangeState("Sleep");
             return;

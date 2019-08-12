@@ -10,7 +10,7 @@ public class Eat : State
      
     public Eat( Duck duck ) : base(duck) { }
 
-    public override void Enter()
+    public override void Enter( object extraData = null )
     {
         Debug.Log("배고파!");
 

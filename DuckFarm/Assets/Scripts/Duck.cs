@@ -26,6 +26,7 @@ public class Duck : ObjectBase
         stateList.Add("Eat", new Eat(this));
         stateList.Add("Sleep", new Sleep(this));
         stateList.Add("Mating", new Mating(this));
+        stateList.Add("Fishing", new Fishing(this));
 
         ChangeState("Idle");
 
@@ -83,11 +84,11 @@ public class Duck : ObjectBase
         return figure;
     }
 
-    public void ChangeState(string stateName)
+    public void ChangeState(string stateName, object extraData = null)
     {
         if ( stateList.ContainsKey(stateName) )
         {
-            ChangeState(stateList[stateName]);
+            ChangeState(stateList[stateName], extraData);
         }
         else
         {
@@ -95,7 +96,7 @@ public class Duck : ObjectBase
         }
     }
 
-    public void ChangeState(State state)
+    public void ChangeState(State state, object extraData = null )
     {
         if( currentState == state )
             return;
@@ -104,8 +105,10 @@ public class Duck : ObjectBase
         //현재 스테이트의 Exit를 호출
         if( currentState != null )
             currentState.Exit();
+
         //바꾸려는 스테이트의 Enter 호출
-        state.Enter();
+        state.Enter(extraData);
+
         //현재 스테이트를 바꾸려는 스테이트로 변경
         currentState = state;
     }

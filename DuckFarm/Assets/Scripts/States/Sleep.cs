@@ -12,7 +12,7 @@ public class Sleep : State
     long wakeUpTimer = 0;
     public Sleep( Duck duck ) : base(duck) { }
 
-    public override void Enter()
+    public override void Enter( object extraData = null )
     {
         Debug.Log($"{owner.ObjectID} 졸려!");
         closeShelter = World.GetInstance().FindCloseBuilding(owner, World.BuildingType.shelter) as PocketBuilding;
@@ -108,7 +108,6 @@ public class Sleep : State
 
         if( currentState == "goingToShelter" )
         {
-            Debug.Log($"{owner.gameObject.name} 쉘터와의 거리 차이 : {ownerAgent.remainingDistance}");
             if( closeShelter != null && ownerAgent.remainingDistance < 0.2f )
             {
                 //축사에 도착했따, 

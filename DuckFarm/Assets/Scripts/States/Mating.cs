@@ -5,7 +5,7 @@ using UnityEngine;
 public class Mating : State
 {
     public Mating( Duck duck ) : base(duck) { }
-    public override void Enter()
+    public override void Enter( object extraData = null )
     {
     }
 
