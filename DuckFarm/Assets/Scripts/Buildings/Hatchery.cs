@@ -38,8 +38,13 @@ public class Hatchery : PocketBuilding
         if( Objects.ContainsKey(objectID) == false )
             return;
 
+        var hatchingEgg = Objects[objectID] as Egg;
+
+        if( hatchingEgg == null )
+            return;
+
         //월드에 아기오리를 요청한다(objctID)
-        World.GetInstance().OnHatchEggInHatchery(this, Objects[objectID]);
+        World.GetInstance().OnHatchEggInHatchery(this, hatchingEgg);
 
         Objects.Remove(objectID);
     }

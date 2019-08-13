@@ -7,7 +7,7 @@ public class Duck : ObjectBase
 {
     enum GrowthLevel { duckling, adult }
     enum WorkState { idle, sleep, eat, mating, work }
-    bool male;
+    public bool male;
     float age = 0;   //단위 = 1일
     float lifespan;
 
@@ -69,7 +69,7 @@ public class Duck : ObjectBase
     void DuckDie()
     {
         Debug.Log($"{ObjectID} : 꽥!");
-        World.GetInstance().OnDuckDied(this.gameObject);
+        World.GetInstance().OnDuckDied(this);
         GameObject.Destroy(this.gameObject);
     }
 

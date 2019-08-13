@@ -8,7 +8,7 @@ public class World : MonoBehaviour
     // 밀리세컨드 단위에 
     public static long CurrentGameWorldTimeMS = 0;
 
-    public static int oneDay = 10000; //1일 = 2000 Millisecond
+    public static int oneDay = 10000; //1일 = Millisecond
     public static float reverseOneDay = 1000.0f / oneDay;
     protected World()
     {
@@ -73,8 +73,8 @@ public class World : MonoBehaviour
         if( hatch != null )
         {
             //알 2개 생성(성별 다름)
-            var egg1 = LayEgg(Vector3.zero);
-            var egg2 = LayEgg(Vector3.zero);
+            var egg1 = LayEgg(Vector3.zero, true);
+            var egg2 = LayEgg(Vector3.zero, false);
 
             hatch.EnterObject(egg1);
             hatch.EnterObject(egg2);
@@ -127,8 +127,8 @@ public class World : MonoBehaviour
     }
     //환경 오브젝트 생성??
 
-    //알 생성
-    ObjectBase LayEgg( Vector3 position )
+    //알 생성(성별랜덤)
+    Egg LayEgg( Vector3 position )
     {
         var resource = Resources.Load("Prefabs/Food/egg");
         if( resource == null )
@@ -136,37 +136,46 @@ public class World : MonoBehaviour
             Debug.Log("알이 없어..");
             return null;
         }
-        GameObject egg = Instantiate(resource, position, Quaternion.identity) as GameObject;
+        GameObject objectBase = Instantiate(resource, position, Quaternion.identity) as GameObject;
 
         string objID = $"egg_{s_uniqueID++}";
-        Food objectBase = egg.GetComponent<Food>();
-        objectBase.ObjectID = objID;
+        Egg egg = objectBase.GetComponent<Egg>();
+        egg.ObjectID = objID;
 
-        foodsList.Add(objID, objectBase);
+        foodsList.Add(objID, egg);
 
-        return objectBase;
+        return egg;
+    }
+    // 알 생성(성별지정)
+    Egg LayEgg( Vector3 position, bool male )
+    {
+        var egg = LayEgg(position);
+        egg.male = male;
+
+        return egg;
     }
 
     //오리 생성함수
-    public void OnHatchEggInHatchery(Hatchery hatchery, ObjectBase egg)
+    public void OnHatchEggInHatchery(Hatchery hatchery, Egg egg)
     {
         Debug.Log("삐약");
 
-        GameObject duckling = Instantiate(Resources.Load("Prefabs/duck"), hatchery.transform.position, Quaternion.identity) as GameObject;
+        GameObject objectBase = Instantiate(Resources.Load("Prefabs/duck"), hatchery.transform.position, Quaternion.identity) as GameObject;
         string objectID = $"duck_{s_uniqueID++}";
-        Duck objectBase = duckling.GetComponent<Duck>();
-        objectBase.ObjectID = objectID;
+        Duck duckling = objectBase.GetComponent<Duck>();
+        duckling.ObjectID = objectID;
+        duckling.male = egg.male;
         duckling.name = objectID;
 
-        ducksList.Add(objectID, objectBase);
+        ducksList.Add(objectID, duckling);
 
         foodsList.Remove(egg.ObjectID);
         GameObject.Destroy(egg.gameObject);
     }
 
-    public void OnDuckDied( GameObject duck )
+    public void OnDuckDied( Duck duck )
     {
-        string duckID = duck.GetComponent<ObjectBase>().ObjectID;
+        string duckID = duck.ObjectID;
         ducksList.Remove(duckID);
         Debug.Log($"{duckID} : 오리가 죽었다.");
     }
