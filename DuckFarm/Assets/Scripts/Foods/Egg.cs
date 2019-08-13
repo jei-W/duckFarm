@@ -3,6 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public class GlobalRandom : System.Random
+{
+    static GlobalRandom _instance = null;
+    public static int GetRandom(int min, int max)
+    {
+        if ( _instance == null )
+            _instance = new GlobalRandom();
+
+        return _instance.Next(min, max);
+    }
+}
+
 public class Egg : Food
 {
     const int freshTime = 28; //알이 완전히 썩기까지 시간
@@ -15,8 +27,9 @@ public class Egg : Food
 
     public void Start()
     {
-        var random = new System.Random();
-        male = random.Next(0, 10) > 5;
+        int r = GlobalRandom.GetRandom(0, 10);
+        Debug.Log($"랜덤 {r}");
+        male = r < 5;
     }
 
     public Egg()
