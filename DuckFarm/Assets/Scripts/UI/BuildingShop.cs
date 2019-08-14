@@ -47,7 +47,7 @@ public class BuildingShop : MonoBehaviour
 
         World.GetInstance().BuildBuilding(preInstallBuildingType, preInstallBuilding.position);
 
-        preInstallBuilding = null;
+        Destroy(preInstallBuilding.gameObject);
         InputSystemManager.Instance.UnregisterMouseDownEvent(OnMouseDown);
         return true;
     }

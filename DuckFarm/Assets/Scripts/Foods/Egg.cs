@@ -27,9 +27,7 @@ public class Egg : Food
 
     public void Start()
     {
-        int r = GlobalRandom.GetRandom(0, 10);
-        Debug.Log($"랜덤 {r}");
-        male = r < 5;
+
     }
 
     public Egg()

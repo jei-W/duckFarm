@@ -15,8 +15,13 @@ public class Duck : ObjectBase
     public float Hunger { get; set; } = 0;
     public float Fatigue { get; set; } = 0;
     public float Stress { get; set; } = 0;
-    public State currentState;
+    State currentState;
     NavMeshAgent agent;
+
+    public string GetCurrentState()
+    {
+        return currentState.ToString();
+    }
 
     private Dictionary<string, State> stateList = new Dictionary<string, State>();
 

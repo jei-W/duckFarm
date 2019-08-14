@@ -142,6 +142,11 @@ public class World : MonoBehaviour
         Egg egg = objectBase.GetComponent<Egg>();
         egg.ObjectID = objID;
 
+        int r = GlobalRandom.GetRandom(0, 10);
+        Debug.Log($"랜덤 {r}");
+        bool male = r < 5;
+        egg.male = male;
+
         foodsList.Add(objID, egg);
 
         return egg;
@@ -263,6 +268,37 @@ public class World : MonoBehaviour
         }
 
         return find;
+    }
+
+    public Duck FindCloseOppositeSexDuck(Duck soloDuck)
+    {
+        float minDistance = float.MaxValue;
+        Vector3 soloDuckPos = soloDuck.transform.position;
+        Duck partner = null;
+
+        List<Duck> oppositSexDucks = new List<Duck>();
+
+        foreach( var duck in ducksList )
+        {
+            if( duck.Value.male != soloDuck.male )
+            {
+                string duckState = duck.Value.GetCurrentState();
+                if( duckState == "Idle" || duckState == "Mating" )
+                    oppositSexDucks.Add(duck.Value);
+            }
+        }
+
+        foreach( var otherDuck in oppositSexDucks )
+        {
+            float betweenDistance = Vector3.SqrMagnitude(soloDuckPos - otherDuck.transform.position);
+            if( betweenDistance < minDistance )
+            {
+                partner = otherDuck;
+                minDistance = betweenDistance;
+            }
+        }
+
+        return partner;
     }
 
     #region Job Queue
