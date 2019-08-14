@@ -36,7 +36,7 @@ public class Eat : State
     {
         if( currentState == "goingToRestaurant" )
         {
-            if( restaurant != null && ownerAgent.remainingDistance < 0.2f )
+            if( restaurant != null && ownerAgent.remainingDistance < 0.5f )
             {
                 //밥에 도착했따, 
                 Debug.Log($"{owner.ObjectID} 밥.. 도착..");

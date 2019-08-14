@@ -8,8 +8,8 @@ public class State
     protected Duck owner;
     protected NavMeshAgent ownerAgent;
     //하루동안 변화하는 양
-    public float hungerChangeValue = 30f;
-    public float fatigueChangeValue = 30f;
+    public float hungerChangeValue = 10f;
+    public float fatigueChangeValue = 5f;
 
     public State( Duck duck )
     {

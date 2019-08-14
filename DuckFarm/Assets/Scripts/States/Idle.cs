@@ -49,8 +49,17 @@ public class Idle : State
             // 이거.. 0.01f 좀 위험한뎅, 충돌나서.. 실제 거리는 엄청 멀텐뎅.
             if ( somethingWorking == false && ownerAgent.remainingDistance < 0.1f )
             {
-                randomPosition = RandomPosition();
-                owner.Move(randomPosition);
+                // 일정확률로 발정상태에 빠진다
+                // 태어난지 5일 이후? 혹은... 마지막 발정 이후 5일 이후 부터 가능
+                if ( owner.LastMatingTime + World.oneDay * 1 >= World.CurrentGameWorldTimeMS && GlobalRandom.GetRandom(1, 100) <= owner.CurrentHeat )
+                {
+                    owner.ChangeState("Mating");
+                }
+                else
+                {
+                    randomPosition = RandomPosition();
+                    owner.Move(randomPosition);
+                }
             }
 
         }
@@ -66,10 +75,6 @@ public class Idle : State
             owner.ChangeState("Eat");
             return;
         }
-
-        //일정확률로 발정상태에 빠진다
-        //if( Random.Range(1, 100) <= 30 )
-        //    owner.ChangeState("Mating");
     }
 
     Vector3 RandomPosition()

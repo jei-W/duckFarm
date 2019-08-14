@@ -13,6 +13,7 @@ public class Duck : ObjectBase
     float originalHeat = 60f; //기초발정확률
 
     public float CurrentHeat { get; private set; }
+    public long LastMatingTime = 0;
     public long SomethingStartTime { get; set; }
     public float Hunger { get; set; } = 0;
     public float Fatigue { get; set; } = 0;
@@ -56,6 +57,11 @@ public class Duck : ObjectBase
     long tempLastTime = 0;
     private void Update()
     {
+        // 오리를 회전 시킨다.
+        // 0.0f 보다.. Epsilon으로 비교하여 실수 오차로 인한 에러를 방지 한다...
+        if ( agent.velocity.sqrMagnitude > Mathf.Epsilon )
+            transform.rotation = Quaternion.LookRotation(agent.velocity.normalized);
+
         //오리 나이를 증가시키자
 
         if ( World.CurrentGameWorldTimeMS/1000 != tempLastTime )
@@ -142,7 +148,6 @@ public class Duck : ObjectBase
 
     public void Move(Vector3 destination)
     {
-        Debug.Log($"??? 중복호출? {destination}");
         //네비게이션 이용하자
         agent.isStopped = true;
         agent.SetDestination(destination);
@@ -158,7 +163,7 @@ public class Duck : ObjectBase
         switch( state )
         {
             case "sleepGround":
-                currentState.hungerChangeValue = 30f;
+                currentState.hungerChangeValue = 10f;
                 currentState.fatigueChangeValue = -25f;
                 break;
             case "sleepShelter":

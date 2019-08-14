@@ -17,18 +17,22 @@ public class Mating : State
     public override void Exit()
     {
         owner.ResetCurrentHeat();
+        owner.LastMatingTime = World.CurrentGameWorldTimeMS;
     }
 
     public override void Update()
     {
         base.Update();
 
-        if( partner == null )
+        if ( partner == null )
+        {
+            owner.ChangeState("Idle");
             return;
+        }
 
         owner.Move(partner.transform.position);
 
-        if( ownerAgent.remainingDistance < 0.3f )
+        if ( ownerAgent.remainingDistance < 0.8f )
         {
             switch( partner.GetCurrentState() )
             {
