@@ -10,7 +10,9 @@ public class Duck : ObjectBase
     public bool male;
     float age = 0;   //단위 = 1일
     float lifespan;
+    float originalHeat = 60f; //기초발정확률
 
+    public float CurrentHeat { get; private set; }
     public long SomethingStartTime { get; set; }
     public float Hunger { get; set; } = 0;
     public float Fatigue { get; set; } = 0;
@@ -38,6 +40,11 @@ public class Duck : ObjectBase
         lifespan = Random.Range(1825f, 3650f); //수명은 5년~10년 사이
 
         agent = GetComponent<NavMeshAgent>();
+
+        //암컷오리는 발정확률이 숫컷보다 낮다
+        if( male == false )
+            originalHeat = 40f;
+        CurrentHeat = originalHeat;
     }
 
     private void FixedUpdate()
@@ -50,6 +57,7 @@ public class Duck : ObjectBase
     private void Update()
     {
         //오리 나이를 증가시키자
+
         if ( World.CurrentGameWorldTimeMS/1000 != tempLastTime )
         {
             Debug.Log($"{ObjectID} {currentState.ToString()} 배고픔:{Hunger} / 피곤:{Fatigue}");
@@ -87,6 +95,11 @@ public class Duck : ObjectBase
 
         figure += Time.deltaTime * expirationTime * World.reverseOneDay;
         return figure;
+    }
+
+    public void ResetCurrentHeat()
+    {
+        CurrentHeat = originalHeat;
     }
 
     public void ChangeState(string stateName, object extraData = null)

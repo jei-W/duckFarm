@@ -128,7 +128,7 @@ public class World : MonoBehaviour
     //환경 오브젝트 생성??
 
     //알 생성(성별랜덤)
-    Egg LayEgg( Vector3 position )
+    public Egg LayEgg( Vector3 position )
     {
         var resource = Resources.Load("Prefabs/Food/egg");
         if( resource == null )
@@ -152,7 +152,7 @@ public class World : MonoBehaviour
         return egg;
     }
     // 알 생성(성별지정)
-    Egg LayEgg( Vector3 position, bool male )
+    public Egg LayEgg( Vector3 position, bool male )
     {
         var egg = LayEgg(position);
         egg.male = male;
