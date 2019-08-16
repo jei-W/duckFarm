@@ -39,6 +39,9 @@ public class PocketBuilding : BuildingBase
 
     public virtual void EnterObject( ObjectBase targetObject )
     {
+        if( AskEnterable() == false )
+            return;
+
         if ( Objects.ContainsKey(targetObject.ObjectID))
         {
             Debug.Log($"{ObjectID} 이미 들어 왔는데? : {targetObject.ObjectID }");

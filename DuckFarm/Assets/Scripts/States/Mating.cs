@@ -6,10 +6,11 @@ public class Mating : State
 {
     Duck partner;
     string currentState = "";
-
+    bool isReadyMakeEgg = false;
     public Mating( Duck duck ) : base(duck) { }
     public override void Enter( object extraData = null )
     {
+        isReadyMakeEgg = false;
         partner = World.GetInstance().FindCloseOppositeSexDuck(owner);
         ChangeMatingState("followingPartner");
     }
@@ -20,9 +21,20 @@ public class Mating : State
         owner.LastMatingTime = World.CurrentGameWorldTimeMS;
     }
 
+    public bool IsReadyMakeEgg()
+    {
+        return isReadyMakeEgg;
+    }
+
     public override void Update()
     {
         base.Update();
+
+        if ( "matingWithPartner" == currentState)
+        {
+            owner.ChangeState("Idle");
+            return;
+        }
 
         if ( partner == null )
         {
@@ -32,18 +44,24 @@ public class Mating : State
 
         owner.Move(partner.transform.position);
 
-        if ( ownerAgent.remainingDistance < 0.8f )
+        if ( (partner.transform.position - owner.transform.position).sqrMagnitude < 0.8f )
         {
-            switch( partner.GetCurrentState() )
+            isReadyMakeEgg = true;
+            switch( partner.GetCurrentStateName() )
             {
                 case "Idle":
                     //상대오리의 발정확률을 증가시킨다
                     partner.ChangeTargetValue(partner.CurrentHeat, 10.0f);
                     break;
                 case "Mating":
-                    //알만들기 한다
-                    ChangeMatingState("matingWithPartner");
-                    owner.ChangeState("Idle");
+                    // 파트너가 메이팅이지만, 아직 준비가 덜 됬을 수도 있다.
+                    // 파트너가 알 만들 준비를 끝냈는지? 물어봐야한다.
+                    Mating partnerState = partner.GetCurrentState() as Mating;
+                    if( partnerState.IsReadyMakeEgg() && isReadyMakeEgg )
+                    {
+                        //알만들기 한다
+                        ChangeMatingState("matingWithPartner");
+                    }
                     break;
                 default:
                     partner = World.GetInstance().FindCloseOppositeSexDuck(owner);
@@ -73,5 +91,10 @@ public class Mating : State
                 //알을 옮기는건 job..
             }
         }
+    }
+
+    void EscapeState(long timeID)
+    {
+
     }
 }

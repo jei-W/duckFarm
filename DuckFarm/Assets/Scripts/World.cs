@@ -38,7 +38,9 @@ public class World : MonoBehaviour
     // 일거리 타입
     public enum JobType
     {
-        CatchFinshInPond, // 연못에서 물고기 잡기
+        CatchFishingInPond, // 연못에서 물고기 잡기
+        CarryOnEggToHatchery, // 알을 부화장에 넣어
+        CarryOnEggToMainStorage, // 알을 창고에 넣어
     }
     Dictionary<JobType, Queue<JobInfo>> jobs = new Dictionary<JobType, Queue<JobInfo>>();
 
@@ -46,7 +48,9 @@ public class World : MonoBehaviour
     {
         CreateNewGame();
 
-        jobs.Add(JobType.CatchFinshInPond, new Queue<JobInfo>());
+        jobs.Add(JobType.CatchFishingInPond, new Queue<JobInfo>());
+        jobs.Add(JobType.CarryOnEggToHatchery, new Queue<JobInfo>());
+        jobs.Add(JobType.CarryOnEggToMainStorage, new Queue<JobInfo>());
     }
 
     // 스크립트 실행 순서에서 항상 World가 먼저 실행되도록 설정하여야 한다.
@@ -255,6 +259,8 @@ public class World : MonoBehaviour
         foreach( var building in buildingList )
         {
             PocketBuilding pocketBuilding = building.Value as PocketBuilding;
+            if( pocketBuilding == null )
+                continue;
 
             if( pocketBuilding.buildingType == buildingType && pocketBuilding.AskEnterable() )
             {
@@ -282,7 +288,7 @@ public class World : MonoBehaviour
         {
             if( duck.Value.male != soloDuck.male )
             {
-                string duckState = duck.Value.GetCurrentState();
+                string duckState = duck.Value.GetCurrentStateName();
                 if( duckState == "Idle" || duckState == "Mating" )
                     oppositSexDucks.Add(duck.Value);
             }
@@ -301,14 +307,43 @@ public class World : MonoBehaviour
         return partner;
     }
 
+    public Egg FindEggAtGround()
+    {
+        foreach( var food in foodsList )
+        {
+            if ( food.Value is Egg && food.Value.transform.parent == null )
+            {
+                return food.Value as Egg;
+            }
+        }
+
+        return null;
+    }
     #region Job Queue
 
     public void RequestCatchFish( BuildingBase pond )
     {
-        jobs[JobType.CatchFinshInPond].Enqueue(new JobInfo()
+        jobs[JobType.CatchFishingInPond].Enqueue(new JobInfo()
         {
             targetBuilding = pond
         });
+    }
+
+    public void RequestCarryOnEggToHatchery( Egg egg)
+    {
+        jobs[JobType.CarryOnEggToHatchery].Enqueue(new JobInfo()
+        {
+            targetFood = egg
+        }
+        );
+    }
+    public void RequestCarryOnEggToMainStorage( Egg egg )
+    {
+        jobs[JobType.CarryOnEggToMainStorage].Enqueue(new JobInfo()
+        {
+            targetFood = egg
+        }
+        );
     }
 
     public bool IsJobEmpty(JobType type)
@@ -329,4 +364,5 @@ public class World : MonoBehaviour
 public class JobInfo
 {
     public BuildingBase targetBuilding = null;
+    public Food targetFood = null;
 }

@@ -49,6 +49,9 @@ public class MainStorage : BuildingBase, IFoodConsumeableBuilding, IResourceCons
     //저장 메소드
     public void InputFood(Food targetObject)
     {
+        if( FoodIsFull() )
+            return;
+
         foodList.Add(targetObject.ObjectID, targetObject);
         CurrentFoodCapacity++;
 
@@ -61,6 +64,9 @@ public class MainStorage : BuildingBase, IFoodConsumeableBuilding, IResourceCons
     }
     public void InputResource( Resource targetObject )
     {
+        if( ResourceIsFull() )
+            return;
+
         resourceList.Add(targetObject.ObjectID, targetObject);
         CurrentResCapacity++;
 
@@ -90,8 +96,11 @@ public class MainStorage : BuildingBase, IFoodConsumeableBuilding, IResourceCons
             }
         }
 
-        if( foodKey != null )
-            foodList.Remove(foodKey);
+        if( foodValue == null )
+            return null;
+
+        foodList.Remove(foodKey);
+        CurrentFoodCapacity--;
 
         foodValue.transform.parent = null;
         var meshRenderer = foodValue.GetComponentInChildren<MeshRenderer>() as MeshRenderer;
@@ -117,8 +126,11 @@ public class MainStorage : BuildingBase, IFoodConsumeableBuilding, IResourceCons
             }
         }
 
-        if( resourceKey != null )
-            resourceList.Remove(resourceKey);
+        if( resourceValue == null )
+            return null;
+
+        resourceList.Remove(resourceKey);
+        CurrentResCapacity--;
 
         resourceValue.transform.parent = null;
         var meshRenderer = resourceValue.GetComponentInChildren<MeshRenderer>() as MeshRenderer;

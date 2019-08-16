@@ -21,9 +21,13 @@ public class Duck : ObjectBase
     State currentState;
     NavMeshAgent agent;
 
-    public string GetCurrentState()
+    public string GetCurrentStateName()
     {
         return currentState.ToString();
+    }
+    public State GetCurrentState()
+    {
+        return currentState;
     }
 
     private Dictionary<string, State> stateList = new Dictionary<string, State>();
@@ -35,6 +39,7 @@ public class Duck : ObjectBase
         stateList.Add("Sleep", new Sleep(this));
         stateList.Add("Mating", new Mating(this));
         stateList.Add("Fishing", new Fishing(this));
+        stateList.Add("Carry", new Carry(this));
 
         ChangeState("Idle");
 
@@ -139,6 +144,9 @@ public class Duck : ObjectBase
 
     public void EatFood( Food food )
     {
+        if( food == null )
+            return;
+
         Hunger -= food.Fullness;
         if( Hunger <= 0 )
             Hunger = 0;
