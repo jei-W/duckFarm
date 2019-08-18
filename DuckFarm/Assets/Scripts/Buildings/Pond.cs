@@ -16,6 +16,7 @@ public class Pond : BuildingBase, IFoodConsumeableBuilding
         // 마우스로 직접 pond를 생성할 건데, start에서 world에 job을 만들게 하자
         // 오리가 있든, 없든, 대기상태의 오리가 있든 없든 일단 큐에 담아두겟지.
         World.GetInstance().RequestCatchFish(this);
+        recognitionDistance = 0.5f;
     }
 
     // Update is called once per frame

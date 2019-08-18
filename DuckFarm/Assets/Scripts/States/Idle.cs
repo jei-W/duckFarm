@@ -81,7 +81,7 @@ public class Idle : State
             }
 
             // 이거.. 0.01f 좀 위험한뎅, 충돌나서.. 실제 거리는 엄청 멀텐뎅.
-            if ( somethingWorking == false && ownerAgent.remainingDistance < 0.1f )
+            if ( somethingWorking == false && ownerAgent.remainingDistance < 0.5f )
             {
                 // 일정확률로 발정상태에 빠진다
                 // 태어난지 5일 이후? 혹은... 마지막 발정 이후 5일 이후 부터 가능

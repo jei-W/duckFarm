@@ -44,7 +44,7 @@ public class Mating : State
 
         owner.Move(partner.transform.position);
 
-        if ( (partner.transform.position - owner.transform.position).sqrMagnitude < 0.8f )
+        if ( (partner.transform.position - owner.transform.position).sqrMagnitude < owner.recognitionDistance )
         {
             isReadyMakeEgg = true;
             switch( partner.GetCurrentStateName() )

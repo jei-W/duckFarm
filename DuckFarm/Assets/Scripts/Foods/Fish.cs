@@ -4,7 +4,11 @@ using UnityEngine;
 
 public class Fish : Food
 {
-    // Start is called before the first frame update
+    public Fish()
+    {
+        recognitionDistance = 0.3f;
+    }
+
     void Start()
     {
         

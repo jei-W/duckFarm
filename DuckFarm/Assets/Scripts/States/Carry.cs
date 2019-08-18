@@ -40,6 +40,7 @@ public class Carry : State
                 if( ( targetBuilding as PocketBuilding ).AskEnterable() == false )
                 {
                     StopCarrySomthing();
+                    return;
                 }
             }
             else if( targetBuilding is IFoodConsumeableBuilding )
@@ -47,6 +48,7 @@ public class Carry : State
                 if( ( targetBuilding as IFoodConsumeableBuilding ).FoodIsFull() )
                 {
                     StopCarrySomthing();
+                    return;
                 }
             }
             else if( targetBuilding is IResourceConsumeableBuilding )
@@ -54,24 +56,12 @@ public class Carry : State
                 if( ( targetBuilding as IResourceConsumeableBuilding ).ResourceIsFull() )
                 {
                     StopCarrySomthing();
+                    return;
                 }
             }
-        }
 
-        if ( ownerAgent.remainingDistance < 1.0f )
-        {
-            if ( currentState == "goToObject")
+            if( ownerAgent.remainingDistance < targetBuilding.recognitionDistance )
             {
-                owner.Move(targetBuilding.transform.position);
-                targetObject.transform.parent = owner.transform;
-                targetObject.gameObject.active = false;
-                targetObject.transform.localPosition = Vector3.zero; 
-
-                currentState = "goToDestinate";
-            }
-            else
-            {
-                // 바부 바보 멍~총이
                 if( targetBuilding is PocketBuilding )
                 {
                     // 여튼 뭔가 들어가는거
@@ -90,6 +80,16 @@ public class Carry : State
 
                 owner.ChangeState("Idle");
             }
+        }
+
+        if( currentState == "goToObject" && ownerAgent.remainingDistance < targetObject.recognitionDistance )
+        {
+            owner.Move(targetBuilding.transform.position);
+            targetObject.transform.parent = owner.transform;
+            targetObject.gameObject.active = false;
+            targetObject.transform.localPosition = Vector3.zero;
+
+            currentState = "goToDestinate";
         }
     }
 

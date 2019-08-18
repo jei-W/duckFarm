@@ -34,6 +34,8 @@ public class Duck : ObjectBase
 
     private void Start()
     {
+        recognitionDistance = 0.8f;
+
         stateList.Add("Idle", new Idle(this));
         stateList.Add("Eat", new Eat(this));
         stateList.Add("Sleep", new Sleep(this));

@@ -24,7 +24,7 @@ public class Sleep : State
         if( closeShelter != null )
         {
             ChangeSleeping("goingToShelter");
-            destination = closeShelter.Door.position;
+            destination = closeShelter.transform.position;
             owner.Move(destination);
         }
         else
@@ -108,7 +108,7 @@ public class Sleep : State
 
         if( currentState == "goingToShelter" )
         {
-            if( closeShelter != null && ownerAgent.remainingDistance < 0.2f )
+            if( closeShelter != null && ownerAgent.remainingDistance < closeShelter.recognitionDistance )
             {
                 //축사에 도착했따, 
                 Debug.Log($"{owner.ObjectID} 축사 도착 했는데..?");
@@ -140,7 +140,7 @@ public class Sleep : State
                 if( closeShelter != null )
                 {
                     // Door는 무조건 있을거야!
-                    destination = closeShelter.Door.position;
+                    destination = closeShelter.transform.position;
                     owner.Move(destination);
                 }
                 else

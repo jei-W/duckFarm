@@ -148,6 +148,7 @@ public class MainStorage : BuildingBase, IFoodConsumeableBuilding, IResourceCons
     public void Start()
     {
         _timerID = WorldTimer.GetInstance().RegisterTimer(World.CurrentGameWorldTimeMS + 3000, TimerCallback);
+        recognitionDistance = 0.5f;
     }
 
     public void AutoMakingFood()

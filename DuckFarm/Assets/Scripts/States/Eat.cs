@@ -7,7 +7,9 @@ public class Eat : State
     Food targetFood;
     IFoodConsumeableBuilding restaurant;
     string currentState = "";
-     
+    float recognitionDistance = 1f;
+
+
     public Eat( Duck duck ) : base(duck) { }
 
     public override void Enter( object extraData = null )
@@ -15,7 +17,10 @@ public class Eat : State
         Debug.Log("배고파!");
 
         //1순위- 사료공장, 2순위- 저장소, 3순위- 완료된 작물, 4순위- 물고기and지렁이
-        restaurant = World.GetInstance().FindCloseBuilding(owner, World.BuildingType.feedFactory) as IFoodConsumeableBuilding;
+        var building = World.GetInstance().FindCloseBuilding(owner, World.BuildingType.feedFactory);
+        restaurant = building as IFoodConsumeableBuilding;
+        if( building != null )
+            recognitionDistance = building.recognitionDistance;
         ChangeEatingState("goingToRestaurant");
     }
 
@@ -36,7 +41,7 @@ public class Eat : State
     {
         if( currentState == "goingToRestaurant" )
         {
-            if( restaurant != null && ownerAgent.remainingDistance < 0.5f )
+            if( restaurant != null && ownerAgent.remainingDistance < recognitionDistance )
             {
                 //밥에 도착했따, 
                 Debug.Log($"{owner.ObjectID} 밥.. 도착..");
@@ -63,6 +68,8 @@ public class Eat : State
                     var building = World.GetInstance().FindMainStorage();
                     destination = building.transform.position;
                     restaurant = building as IFoodConsumeableBuilding;
+                    if( building != null )
+                        recognitionDistance = building.recognitionDistance;
                 }
                 owner.Move(destination);
                 break;

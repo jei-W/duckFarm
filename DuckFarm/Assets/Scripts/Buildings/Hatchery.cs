@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class Hatchery : PocketBuilding
 {
+    public Hatchery()
+    {
+        recognitionDistance = 0.5f;
+    }
+
     //오브젝트(알)의 요청에 따라 들여보낸다
     //들어온 알의 부화 시간을 잰다(28일)
     public override void EnterObject( ObjectBase targetObject )

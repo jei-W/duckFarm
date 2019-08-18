@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class Shelter : PocketBuilding
 {
+    public Shelter()
+    {
+        recognitionDistance = 0.5f;
+    }
+
     public override void EnterObject( ObjectBase targetObject )
     {
         Duck targetDuck = targetObject as Duck;

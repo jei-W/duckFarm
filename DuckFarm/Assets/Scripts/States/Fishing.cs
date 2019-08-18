@@ -54,7 +54,7 @@ public class Fishing : State
 
         if ( currentState == "goToPond" )
         {
-            if ( ownerAgent.remainingDistance < 2.0f )
+            if ( ownerAgent.remainingDistance < targetPond.recognitionDistance )
             {
                 currentState = "getFish";
                 return;
@@ -62,15 +62,6 @@ public class Fishing : State
         }
         else if ( currentState == "goToStorage" )
         {
-            //if ( ownerAgent.remainingDistance < 2.0f )
-            //{
-            //    var mainStorage = World.GetInstance().FindMainStorage() as MainStorage;
-            //    mainStorage.InputFood(currentFish);
-            //    currentFish = null;
-            //    Debug.Log($"{owner.ObjectID} 창고에 물고기를 넣었따.");
-            //    owner.ChangeState("Idle");
-            //    return;
-            //}
             owner.ChangeState("Carry", new Dictionary<string, ObjectBase>() {
                         { "target", currentFish },
                         { "targetBuilding", World.GetInstance().FindMainStorage() }

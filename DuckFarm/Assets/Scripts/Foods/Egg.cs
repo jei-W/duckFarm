@@ -33,6 +33,7 @@ public class Egg : Food
     public Egg()
     {
         freshDecrement = 100 / freshTime;
+        recognitionDistance = 0.3f;
     }
 
     private void Update()

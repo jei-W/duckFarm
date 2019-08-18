@@ -12,22 +12,10 @@ public class PocketBuilding : BuildingBase
     // 현재 수용량
     int CurrentCapacity = 0;
 
-    // PocketBuilding은 문의 위치를 알리는 빈 오브젝트가 필수.
-    public Transform Door = null;
-
     protected Dictionary<string, ObjectBase> Objects = new Dictionary<string, ObjectBase>();
 
     public void Start()
     {
-        if ( Door == null )
-        {
-            Door = transform.Find("Door");
-        }
-
-        if ( Door == null )
-        {
-            Debug.LogError("PocketBuilding은 Door위치 오브젝트가 필수!");
-        }
     }
     // 오브젝트를 들여보낸다?
     public bool AskEnterable()
