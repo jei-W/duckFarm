@@ -43,7 +43,7 @@ public class Duck : ObjectBase
 
         ChangeState("Idle");
 
-        lifespan = Random.Range(1825f, 3650f); //수명은 5년~10년 사이
+        lifespan = Random.Range(World.oneDay * 100.0f, World.oneDay * 180.0f); //수명은 100일 ~ 180일 사이
 
         agent = GetComponent<NavMeshAgent>();
 
@@ -68,6 +68,7 @@ public class Duck : ObjectBase
             transform.rotation = Quaternion.LookRotation(agent.velocity.normalized);
 
         //오리 나이를 증가시키자
+        age += Time.deltaTime * World.oneDay;
 
         if ( World.CurrentGameWorldTimeMS/1000 != tempLastTime )
         {

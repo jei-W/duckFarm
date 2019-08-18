@@ -34,6 +34,7 @@ public class World : MonoBehaviour
     //오리 리스트
     Dictionary<string, Duck> ducksList = new Dictionary<string, Duck>();
     Dictionary<string, Food> foodsList = new Dictionary<string, Food>();
+    Dictionary<string, Resource> resourcesList = new Dictionary<string, Resource>();
 
     // 일거리 타입
     public enum JobType
@@ -152,6 +153,7 @@ public class World : MonoBehaviour
         egg.male = male;
 
         foodsList.Add(objID, egg);
+        eggCount++;
 
         return egg;
     }
@@ -180,6 +182,7 @@ public class World : MonoBehaviour
 
         foodsList.Remove(egg.ObjectID);
         GameObject.Destroy(egg.gameObject);
+        eggCount--;
     }
 
     public void OnDuckDied( Duck duck )
@@ -214,6 +217,9 @@ public class World : MonoBehaviour
     {
         foodsList.Remove(food.ObjectID);
         GameObject.Destroy(food.gameObject);
+
+        if( food is Egg)
+            eggCount--;
     }
 
     //가까이에 있는 건물를 알려주자
@@ -357,6 +363,42 @@ public class World : MonoBehaviour
             return null;
 
         return jobs[type].Dequeue();
+    }
+    #endregion
+
+    #region MainUI Data
+    int woodCount = 0;
+    int stoneCount = 0;
+    int eggCount = 0;
+
+    public string GetCurrentGameWorldTimeToString()
+    {
+        int days = Convert.ToInt32(CurrentGameWorldTimeMS / oneDay);
+        int time = Convert.ToInt32(CurrentGameWorldTimeMS % oneDay);
+        float oneMinute = oneDay / 1440.0f;
+        int timeToMinute = Convert.ToInt32(time / oneMinute);
+
+        return string.Format("{0}일째 {1,2:D2}시 {2,2:D2}분", days, timeToMinute / 60, timeToMinute % 60);
+    }
+    public int GetDuckCount()
+    {
+        return ducksList.Count;
+    }
+    public int GetWoodCount()
+    {
+        return woodCount;
+    }
+    public int GetStoneCount()
+    {
+        return stoneCount;
+    }
+    public int GetFoodCount()
+    {
+        return foodsList.Count;
+    }
+    public int GetEggCount()
+    {
+        return eggCount;
     }
     #endregion
 }
