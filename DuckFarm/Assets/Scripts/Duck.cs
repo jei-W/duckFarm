@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -45,7 +46,7 @@ public class Duck : ObjectBase
 
         ChangeState("Idle");
 
-        lifespan = Random.Range(World.oneDay * 100.0f, World.oneDay * 180.0f); //수명은 100일 ~ 180일 사이
+        lifespan = UnityEngine.Random.Range(World.oneDay * 100.0f, World.oneDay * 180.0f); //수명은 100일 ~ 180일 사이
 
         agent = GetComponent<NavMeshAgent>();
 
@@ -60,8 +61,6 @@ public class Duck : ObjectBase
         currentState?.FixedUpdate();
     }
 
-    // 너무 로그가 많이 떠서...
-    long tempLastTime = 0;
     private void Update()
     {
         // 오리를 회전 시킨다.
@@ -71,12 +70,6 @@ public class Duck : ObjectBase
 
         //오리 나이를 증가시키자
         age += Time.deltaTime * World.oneDay;
-
-        if ( World.CurrentGameWorldTimeMS/1000 != tempLastTime )
-        {
-            Debug.Log($"{ObjectID} {currentState.ToString()} 배고픔:{Hunger} / 피곤:{Fatigue}");
-            tempLastTime = World.CurrentGameWorldTimeMS / 1000;
-        }
 
         currentState?.Update();
 
@@ -183,4 +176,11 @@ public class Duck : ObjectBase
                 break;
         }
     }
+
+    //오리의 행동 우선순위
+    #region Priority
+    //우선순위는 3순위까지 있음
+    public Dictionary<Func<bool>, Action>[] priorityLists = new Dictionary<Func<bool>, Action>[3];
+
+    #endregion
 }

@@ -282,6 +282,41 @@ public class World : MonoBehaviour
         return find;
     }
 
+    public BuildingBase FindFoodLeftRestaurant( ObjectBase finder )
+    {
+        float minDistance = float.MaxValue;
+        BuildingBase find = null;
+
+        //사료가 남아있는 사료공장 중, 가까이 있는 거를 찾는다
+        foreach( var building in buildingList )
+        {
+            var restaurant = building.Value as FeedFactory;
+
+            if( restaurant == null)
+            {
+                continue;
+            }
+            else //빌딩 == 사료공장
+            {
+                if( restaurant.FoodIsEmpty() )
+                    continue;
+
+                float distansce = ( restaurant.transform.position - finder.transform.position ).sqrMagnitude;
+                if( minDistance >= distansce )
+                {
+                    minDistance = distansce;
+                    find = restaurant;
+                }
+            }
+        }
+
+        // 사료제공 가능한 사료공장이 없으면 저장고로 간다
+        if( find == null )
+            find = FindMainStorage();
+
+        return find;
+    }
+
     public Duck FindCloseOppositeSexDuck(Duck soloDuck)
     {
         float minDistance = float.MaxValue;
@@ -325,8 +360,8 @@ public class World : MonoBehaviour
 
         return null;
     }
-    #region Job Queue
 
+    #region Job Queue
     public void RequestCatchFish( BuildingBase pond )
     {
         jobs[JobType.CatchFishingInPond].Enqueue(new JobInfo()
