@@ -47,10 +47,10 @@ public class MainStorage : BuildingBase, IFoodConsumeableBuilding, IResourceCons
     }
 
     //저장 메소드
-    public void InputFood(Food targetObject)
+    public bool InputFood(Food targetObject)
     {
-        if( FoodIsFull() )
-            return;
+        if( FoodIsFull() || targetObject == null)
+            return false;
 
         foodList.Add(targetObject.ObjectID, targetObject);
         CurrentFoodCapacity++;
@@ -61,11 +61,13 @@ public class MainStorage : BuildingBase, IFoodConsumeableBuilding, IResourceCons
         {
             meshRenderer.enabled = false;
         }
+
+        return true;
     }
-    public void InputResource( Resource targetObject )
+    public bool InputResource( Resource targetObject )
     {
-        if( ResourceIsFull() )
-            return;
+        if( ResourceIsFull() || targetObject == null )
+            return false;
 
         resourceList.Add(targetObject.ObjectID, targetObject);
         CurrentResCapacity++;
@@ -76,6 +78,8 @@ public class MainStorage : BuildingBase, IFoodConsumeableBuilding, IResourceCons
         {
             meshRenderer.enabled = false;
         }
+
+        return true;
     }
 
     //꺼내기 메소드

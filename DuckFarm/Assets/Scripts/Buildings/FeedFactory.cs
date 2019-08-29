@@ -35,7 +35,7 @@ public class FeedFactory : BuildingBase, IFoodConsumeableBuilding
         return outputFood.Dequeue();
     }
 
-    public void InputFood( Food targetObject )
+    public bool InputFood( Food targetObject )
     {
         //재료를 집어넣는 기능?
         throw new System.NotImplementedException();

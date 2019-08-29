@@ -42,6 +42,7 @@ public class World : MonoBehaviour
         CatchFishingInPond, // 연못에서 물고기 잡기
         CarryOnEggToHatchery, // 알을 부화장에 넣어
         CarryOnEggToMainStorage, // 알을 창고에 넣어
+        CarrySomethingStopped //뭔가 옮기다 중단됐었다..?
     }
     Dictionary<JobType, Queue<JobInfo>> jobs = new Dictionary<JobType, Queue<JobInfo>>();
 
@@ -52,6 +53,7 @@ public class World : MonoBehaviour
         jobs.Add(JobType.CatchFishingInPond, new Queue<JobInfo>());
         jobs.Add(JobType.CarryOnEggToHatchery, new Queue<JobInfo>());
         jobs.Add(JobType.CarryOnEggToMainStorage, new Queue<JobInfo>());
+        jobs.Add(JobType.CarrySomethingStopped, new Queue<JobInfo>());
     }
 
     // 스크립트 실행 순서에서 항상 World가 먼저 실행되도록 설정하여야 한다.
@@ -374,7 +376,7 @@ public class World : MonoBehaviour
     {
         jobs[JobType.CarryOnEggToHatchery].Enqueue(new JobInfo()
         {
-            targetFood = egg
+            targetObject = egg
         }
         );
     }
@@ -382,7 +384,16 @@ public class World : MonoBehaviour
     {
         jobs[JobType.CarryOnEggToMainStorage].Enqueue(new JobInfo()
         {
-            targetFood = egg
+            targetObject = egg
+        }
+        );
+    }
+    public void RequestCarrySomethingStopped( ObjectBase something, BuildingBase building )
+    {
+        jobs[JobType.CarrySomethingStopped].Enqueue(new JobInfo()
+        {
+            targetObject = something,
+            targetBuilding = building
         }
         );
     }
@@ -441,5 +452,5 @@ public class World : MonoBehaviour
 public class JobInfo
 {
     public BuildingBase targetBuilding = null;
-    public Food targetFood = null;
+    public ObjectBase targetObject = null;
 }

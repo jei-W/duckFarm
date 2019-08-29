@@ -37,9 +37,9 @@ public class Pond : BuildingBase, IFoodConsumeableBuilding
         return false;
     }
 
-    public void InputFood( Food targetObject )
+    public bool InputFood( Food targetObject )
     {
-        return;
+        return false;
     }
 
     public Food GetFood()

@@ -5,6 +5,8 @@ using UnityEngine;
 // 피.싱. 오리가 연못에서 물고기를 잡다 ㅎㅎㅎ..
 public class Fishing : State
 {
+    bool isWorkOver;
+
     Pond targetPond = null;
     Food currentFish = null;
 
@@ -26,6 +28,15 @@ public class Fishing : State
 
         currentState = "goToPond"; // pond로 걸어가자.
         owner.Move(targetPond.transform.position);
+
+        isWorkOver = false;
+    }
+
+    public override void Exit()
+    {
+        //물고기를 잡으러 가는 중에 끝났으면 다시 물고기 잡는 일을 등록한다
+        if( isWorkOver ==false)
+            World.GetInstance().RequestCatchFish(targetPond);
     }
 
     public override void Update()
@@ -40,18 +51,6 @@ public class Fishing : State
             return;
         }
 
-        if ( currentFish != null && owner.Hunger > 50.0f )
-        {
-            // 그냥 먹어버리자.
-            ownerAgent.isStopped = true; //일단 세우고
-
-            owner.EatFood(currentFish);
-            currentFish = null;
-            Debug.Log($"{owner.ObjectID} 창고까지 못가져가겟다. 먹겠다.");
-            owner.ChangeState("Idle");
-            return;
-        }
-
         if ( currentState == "goToPond" )
         {
             if ( ownerAgent.remainingDistance < targetPond.recognitionDistance )
@@ -59,14 +58,6 @@ public class Fishing : State
                 currentState = "getFish";
                 return;
             }
-        }
-        else if ( currentState == "goToStorage" )
-        {
-            owner.ChangeState("Carry", new Dictionary<string, ObjectBase>() {
-                        { "target", currentFish },
-                        { "targetBuilding", World.GetInstance().FindMainStorage() }
-                    });
-            return;
         }
         else if ( currentState == "getFish" )
         {
@@ -79,6 +70,8 @@ public class Fishing : State
             }
             else
             {
+                // 약간의 딜레이 시간을 준다.. ..귀찮으니깐 바로 캐가도록 하자.
+
                 currentFish = targetPond.GetFood();
 
                 Debug.Log($"{owner.ObjectID} 물고기를 얻었다 : {currentFish.ObjectID}");
@@ -86,13 +79,19 @@ public class Fishing : State
                 currentFish.transform.parent = owner.transform;
                 currentFish.transform.localPosition = Vector3.zero;
                 currentFish.gameObject.active = false;
-                currentState = "goToStorage"; // 어디냐 저기 창고로 걸어가자.
-                
-                owner.Move(World.GetInstance().FindMainStorage().transform.position);
+                currentState = "goToStorage";
+
+                isWorkOver = true;
             }
         }
-
-        // 약간의 딜레이 시간을 준다.. ..귀찮으니깐 바로 캐가도록 하자.
+        else if( currentState == "goToStorage" )
+        {
+            // 잡은 물고기를 창고로 옮기자
+            owner.ChangeState("Carry", new Dictionary<string, ObjectBase>() {
+                        { "target", currentFish },
+                        { "targetBuilding", World.GetInstance().FindMainStorage() }
+                    });
+            return;
+        }
     }
-
 }

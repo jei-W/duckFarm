@@ -9,14 +9,20 @@ public class Idle : State
     Vector3 randomPosition;
 
     Func<bool> changeStateToMatingCondition;
-    Func<bool> workConditionForFishing;
-    Func<bool> workConditionForCarryEggToHatchery;
-    Func<bool> workConditionForCarryEggToMainStorage;
+    Func<bool> jobConditionForFishing;
+    Func<bool> jobConditionForCarryEggToHatchery;
+    Func<bool> jobConditionForCarryEggToMainStorage;
+    Func<bool> changeStateToEatCondition;
+    Func<bool> changeStateToSleepCondition;
+    Func<bool> jobConditionForLeftWork;
 
     Action changeStateToMating;
     Action workForFishing;
     Action workForCarryEggToHatchery;
     Action workForCarryEggToMainStorage;
+    Action changeStateToEat;
+    Action changeStateToSleep;
+    Action workForSomethingToLeft;
 
     public Idle( Duck duck ) : base(duck)
     {
@@ -33,7 +39,17 @@ public class Idle : State
         };
         changeStateToMating = () => owner.ChangeState("Mating");
 
-        workConditionForFishing = () => World.GetInstance().IsJobEmpty(World.JobType.CatchFishingInPond) == false;
+        jobConditionForLeftWork = () => World.GetInstance().IsJobEmpty(World.JobType.CarrySomethingStopped) == false;
+        workForSomethingToLeft = () => {
+            JobInfo job = World.GetInstance().GetFirstJob(World.JobType.CarrySomethingStopped);
+            if( job != null )
+                owner.ChangeState("Carry", new Dictionary<string, ObjectBase>() {
+                        { "target", job.targetObject },
+                        { "targetBuilding", job.targetBuilding }
+                });
+        };
+
+        jobConditionForFishing = () => World.GetInstance().IsJobEmpty(World.JobType.CatchFishingInPond) == false;
         workForFishing = () => {
             // 물고기 캐러 가자
             JobInfo job = World.GetInstance().GetFirstJob(World.JobType.CatchFishingInPond);
@@ -41,38 +57,51 @@ public class Idle : State
                 owner.ChangeState("Fishing", job.targetBuilding);
         };
 
-        workConditionForCarryEggToHatchery = () => World.GetInstance().IsJobEmpty(World.JobType.CarryOnEggToHatchery) == false;
+        jobConditionForCarryEggToHatchery = () => World.GetInstance().IsJobEmpty(World.JobType.CarryOnEggToHatchery) == false;
         workForCarryEggToHatchery = () => {
             // 알옮기자, 부화장으로
             JobInfo job = World.GetInstance().GetFirstJob(World.JobType.CarryOnEggToHatchery);
             if( job != null )
             {
                 owner.ChangeState("Carry", new Dictionary<string, ObjectBase>() {
-                        { "target", job.targetFood },
+                        { "target", job.targetObject },
                         { "targetBuilding", World.GetInstance().FindEnterablePocketBuilding(owner, World.BuildingType.hatchery) }
                 });
             }
         };
 
-        workConditionForCarryEggToMainStorage = () => World.GetInstance().IsJobEmpty(World.JobType.CarryOnEggToMainStorage) == false;
+        jobConditionForCarryEggToMainStorage = () => World.GetInstance().IsJobEmpty(World.JobType.CarryOnEggToMainStorage) == false;
         workForCarryEggToMainStorage = () => {
             // 알옮기자, 저장고로
             JobInfo job = World.GetInstance().GetFirstJob(World.JobType.CarryOnEggToMainStorage);
             if( job != null )
             {
                 owner.ChangeState("Carry", new Dictionary<string, ObjectBase>() {
-                        { "target", job.targetFood },
+                        { "target", job.targetObject },
                         { "targetBuilding", World.GetInstance().FindMainStorage() }
                 });
             }
         };
 
+        changeStateToEatCondition = () => owner.Hunger >= 60;
+        changeStateToEat = () => owner.ChangeState("Eat");
+
+        changeStateToSleepCondition = () => owner.Fatigue >= 70;
+        changeStateToSleep = () => owner.ChangeState("Sleep");
+
         //우선순위 리스트에 다 때려넣어보자
-        owner.priorityLists[0] = new Dictionary<Func<bool>, Action> {
-            { workConditionForFishing, workForFishing },
-            { workConditionForCarryEggToHatchery, workForCarryEggToHatchery },
-            { workConditionForCarryEggToMainStorage, workForCarryEggToMainStorage },
-            { changeStateToMatingCondition, changeStateToMating }
+        owner.priorityLists[0] = new Dictionary<string,KeyValuePair<Func<bool>, Action>> {
+            { "CarrySomethingStopped", new KeyValuePair<Func<bool>,Action>(jobConditionForLeftWork, workForSomethingToLeft) },
+            { "ChangeStateToFishing", new KeyValuePair<Func<bool>,Action>(jobConditionForFishing, workForFishing) },
+            { "CarryEggToHatchery", new KeyValuePair<Func<bool>,Action>(jobConditionForCarryEggToHatchery, workForCarryEggToHatchery) },
+            { "CarryEggToMainStorage", new KeyValuePair<Func<bool>,Action>(jobConditionForCarryEggToMainStorage, workForCarryEggToMainStorage) },
+        };
+        owner.priorityLists[1] = new Dictionary<string, KeyValuePair<Func<bool>, Action>> {
+            { "ChangeStateToEat", new KeyValuePair<Func<bool>,Action>(changeStateToEatCondition, changeStateToEat) },
+            { "ChangeStateToSleep", new KeyValuePair<Func<bool>,Action>(changeStateToSleepCondition, changeStateToSleep) }
+        };
+        owner.priorityLists[2] = new Dictionary<string, KeyValuePair<Func<bool>, Action>> {
+            { "ChangeStateToMating", new KeyValuePair<Func<bool>,Action>(changeStateToMatingCondition, changeStateToMating) }
         };
     }
 
@@ -102,9 +131,9 @@ public class Idle : State
             {
                 foreach( var somethingAction in priorityList )
                 {
-                    if( somethingAction.Key() )
+                    if( somethingAction.Value.Key() )
                     {
-                        somethingAction.Value();
+                        somethingAction.Value.Value();
                         return;
                     }
                 }
@@ -117,18 +146,6 @@ public class Idle : State
                 randomPosition = RandomPosition();
                 owner.Move(randomPosition);
             }
-        }
-
-        // 배고픔과 피곤이 증가함에 따라 상태 변화의 우선순위가 올라가야한다.
-        if( owner.Fatigue >= 60 )
-        {
-            owner.ChangeState("Sleep");
-            return;
-        }
-        if( owner.Hunger >= 70 )
-        {
-            owner.ChangeState("Eat");
-            return;
         }
     }
 

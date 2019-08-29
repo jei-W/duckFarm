@@ -6,6 +6,6 @@ interface IFoodConsumeableBuilding
 {
     bool FoodIsFull();
     bool FoodIsEmpty();
-    void InputFood( Food targetObject );
+    bool InputFood( Food targetObject );
     Food GetFood();
 }

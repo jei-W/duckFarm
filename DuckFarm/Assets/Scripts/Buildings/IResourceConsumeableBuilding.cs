@@ -6,6 +6,6 @@ interface IResourceConsumeableBuilding
 {
     bool ResourceIsFull();
     bool ResourceIsEmpty();
-    void InputResource( Resource targetObject );
+    bool InputResource( Resource targetObject );
     Resource GetResource( World.ResourceType type );
 }

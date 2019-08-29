@@ -125,7 +125,7 @@ public class Sleep : State
         if( currentState == "goingToShelter" )
         {
             // 아래부분은 매 프레임 검사해줘야 하는 것이므로, 업데이트 함수에서...
-            if( owner.Fatigue >= 90.0f || closeShelter == null ) // 혹시나 남겨둠.
+            if( owner.Fatigue >= 97.0f || closeShelter == null ) // 혹시나 남겨둠.
             {
                 // 너무 졸립다! 
                 ChangeSleeping("sleepGround");

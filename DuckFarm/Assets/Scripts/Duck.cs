@@ -71,6 +71,17 @@ public class Duck : ObjectBase
         //오리 나이를 증가시키자
         age += Time.deltaTime * World.oneDay;
 
+        //긴급 생존 조건
+        if( Hunger >= 90 )
+        {
+            if( Hunger > Fatigue )
+                ChangeState("Eat");
+        }
+        if( Fatigue >= 90 )
+        {
+            ChangeState("Sleep");
+        }
+
         currentState?.Update();
 
         if( Hunger > 100 || Fatigue > 100 )
@@ -180,7 +191,41 @@ public class Duck : ObjectBase
     //오리의 행동 우선순위
     #region Priority
     //우선순위는 3순위까지 있음
-    public Dictionary<Func<bool>, Action>[] priorityLists = new Dictionary<Func<bool>, Action>[3];
+    public Dictionary<string, KeyValuePair<Func<bool>, Action>>[] priorityLists = new Dictionary<string, KeyValuePair<Func<bool>, Action>>[3];
 
+    public void ChangePriorityRanking(string targetKey, int priorityRank)
+    {
+        if( priorityRank > 2 || priorityRank < 0 )
+        {
+            Debug.Log("우선순위는 0~2까지 있음");
+            return;
+        }
+
+        KeyValuePair<Func<bool>, Action> target;
+
+        for( int i = 0; i < 3; i++ )
+        {
+            if( priorityLists[i].ContainsKey(targetKey) )
+            {
+                if( priorityRank == i )
+                {
+                    Debug.Log("우선순위 변동없음");
+                    return;
+                }
+
+                target = priorityLists[i][targetKey];
+                priorityLists[i].Remove(targetKey);
+                break;
+            }
+
+            if( i == 2 ) //끝까지 targetKey가없었다면
+            {
+                Debug.Log("string targetKey가 잘못되었음");
+                return;
+            }
+        }
+
+        priorityLists[priorityRank].Add(targetKey, target);
+    }
     #endregion
 }

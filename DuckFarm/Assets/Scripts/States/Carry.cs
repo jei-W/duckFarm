@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class Carry : State
 {
-    ObjectBase targetBuilding = null;
+    bool isWorkOver;
+
+    BuildingBase targetBuilding = null;
     ObjectBase targetObject = null;
 
     string currentState = "";
@@ -22,10 +24,36 @@ public class Carry : State
             return;
         }
         targetObject = data["target"];
-        targetBuilding = data["targetBuilding"];
+        targetBuilding = data["targetBuilding"] as BuildingBase;
 
-        owner.Move(targetObject.transform.position);
-        currentState = "goToObject";
+        //이미 타겟오브젝트를 들고 있는 상태라면
+        if( targetObject.transform.parent == owner )
+        {
+            owner.Move(targetBuilding.transform.position);
+            currentState = "goToDestinate";
+        }
+        else
+        {
+            owner.Move(targetObject.transform.position);
+            currentState = "goToObject";
+        }
+
+        isWorkOver = false;
+    }
+
+    public override void Exit()
+    {
+        // 물건을 옮기는 중에 나간다면
+        if( isWorkOver == false )
+        {
+            //옮기던 물건을 바닥에 떨군다
+            Debug.Log("긴급탈출! 못옮겨!");
+            targetObject.transform.parent = null;
+            targetObject.gameObject.active = true;
+
+            //떨군거 옮기는 일을 다시 등록한다
+            World.GetInstance().RequestCarrySomethingStopped(targetObject, targetBuilding);
+        }
     }
 
     public override void Update()
@@ -62,6 +90,8 @@ public class Carry : State
 
             if( ownerAgent.remainingDistance < targetBuilding.recognitionDistance )
             {
+                bool enableEnter = true;
+
                 if( targetBuilding is PocketBuilding )
                 {
                     // 여튼 뭔가 들어가는거
@@ -70,15 +100,20 @@ public class Carry : State
                 else if( targetBuilding is IFoodConsumeableBuilding )
                 {
                     // 음식 형태
-                    ( targetBuilding as IFoodConsumeableBuilding ).InputFood(targetObject as Food);
+                    enableEnter = ( targetBuilding as IFoodConsumeableBuilding ).InputFood(targetObject as Food);
                 }
                 else if( targetBuilding is IResourceConsumeableBuilding )
                 {
                     // 리소스 형태
-                    ( targetBuilding as IResourceConsumeableBuilding ).InputResource(targetObject as Resource);
+                    enableEnter = ( targetBuilding as IResourceConsumeableBuilding ).InputResource(targetObject as Resource);
                 }
 
-                owner.ChangeState("Idle");
+                if( enableEnter == false ) //집어넣을 수 없을 때
+                    StopCarrySomthing();
+                else
+                    owner.ChangeState("Idle");
+
+                return;
             }
         }
 
@@ -96,6 +131,8 @@ public class Carry : State
     //옮기기 중지
     void StopCarrySomthing()
     {
+        isWorkOver = true;
+
         Debug.Log("안옮겨! 못옮겨!");
         targetObject.transform.parent = null;
         targetObject.gameObject.active = true;
