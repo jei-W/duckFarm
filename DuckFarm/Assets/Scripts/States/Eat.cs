@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -34,6 +35,7 @@ public class Eat : State
         if( owner.Hunger <= 30 )
         {
             owner.ChangeState("Idle");
+            return;
         }
 
         //상태 분기
@@ -45,7 +47,7 @@ public class Eat : State
                     if( targetBuilding is MainStorage )
                         //사료공장도 비었고, 저장소도 비었다
                         //작물이나 물고기를 먹자
-                        ChangeEatingState("EatingSomething");
+                        ChangeEatingState("FindSomethingFood");
                     else
                     {
                         //가려던 사료공장이 중간에 비었다.
@@ -58,8 +60,13 @@ public class Eat : State
                     }
                 }
                 break;
+            case "goingToSomethingFood":
+                if( targetFood == null )
+                    ChangeEatingState("FindSomethingFood");
+                break;
             default:
                 Debug.Log("state가 잘못됐어!");
+                ChangeEatingState("goingToRestaurant");
                 break;
 
         }
@@ -75,6 +82,15 @@ public class Eat : State
                 //밥에 도착했따, 
                 Debug.Log($"{owner.ObjectID} 밥.. 도착..");
                 ChangeEatingState("EatingAtRestaurant");
+            }
+        }
+        else if( currentState == "goingToSomethingFood" )
+        {
+            if( ownerAgent.remainingDistance < recognitionDistance )
+            {
+                //밥에 도착했따, 
+                Debug.Log($"{owner.ObjectID} 밥.. 도착..");
+                ChangeEatingState("EatingSomething");
             }
         }
     }
@@ -97,8 +113,42 @@ public class Eat : State
                 owner.EatFood(targetFood);
                 owner.ChangeState("Idle");
                 break;
+            case "FindSomethingFood":
+                Food something = null;
+
+                // 원래라면 밭농작물 - 바닥에 떨어진 푸드 - 낚시(물고기무한정X) - 바닥에 떨어진 알 순서
+                Func<Food> foodOnGround = () => World.GetInstance().FindFoodAtGroundNotEgg();
+                Func<Food> eggOnGround = () => World.GetInstance().FindEggAtGround();
+
+                List<Func<Food>> somethingFoodFuncList = new List<Func<Food>> { foodOnGround, eggOnGround };
+                foreach(var findSomtingFood in somethingFoodFuncList )
+                {
+                    something = findSomtingFood();
+
+                    if( something != null )
+                    {
+                        targetFood = something;
+                        recognitionDistance = targetFood.recognitionDistance;
+
+                        ChangeEatingState("goingToSomethingFood");
+                        return;
+                    }
+                }
+                owner.ChangeState("Fishing", World.GetInstance().FindCloseBuilding(owner, World.BuildingType.pond));
+                break;
+            case "goingToSomethingFood":
+                owner.Move(targetFood.transform.position);
+                break;
             case "EatingSomething":
-                owner.ChangeState("Fishing");
+                if( targetFood.transform.parent != null )
+                {
+                    ChangeEatingState("goingToSomethingFood");
+                    return;
+                }
+
+                Debug.Log("냠냠");
+                owner.EatFood(targetFood);
+                owner.ChangeState("Idle");
                 break;
             default:
                 Debug.Log("state가 잘못됐어!");

@@ -362,6 +362,18 @@ public class World : MonoBehaviour
 
         return null;
     }
+    public Food FindFoodAtGroundNotEgg()
+    {
+        foreach( var food in foodsList )
+        {
+            if( food.Value is Egg == false && food.Value.transform.parent == null )
+            {
+                return food.Value;
+            }
+        }
+
+        return null;
+    }
 
     #region Job Queue
     public void RequestCatchFish( BuildingBase pond )

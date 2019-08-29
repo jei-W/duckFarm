@@ -47,7 +47,7 @@ public class Carry : State
         if( isWorkOver == false )
         {
             //옮기던 물건을 바닥에 떨군다
-            Debug.Log("긴급탈출! 못옮겨!");
+            Debug.Log($"{owner.name} : 긴급탈출! {targetObject.name} 못옮겨!");
             targetObject.transform.parent = null;
             targetObject.gameObject.active = true;
 
@@ -111,10 +111,13 @@ public class Carry : State
                 if( enableEnter == false ) //집어넣을 수 없을 때
                     StopCarrySomthing();
                 else
+                {
+                    isWorkOver = true;
                     owner.ChangeState("Idle");
-
-                return;
+                }
             }
+
+            return;
         }
 
         if( currentState == "goToObject" && ownerAgent.remainingDistance < targetObject.recognitionDistance )

@@ -10,7 +10,7 @@ public class Duck : ObjectBase
     enum WorkState { idle, sleep, eat, mating, work }
     public bool male;
     float age = 0;   //단위 = 1일
-    float lifespan;
+    long lifespan;
     float originalHeat = 60f; //기초발정확률
 
     public float CurrentHeat { get; private set; }
@@ -36,6 +36,7 @@ public class Duck : ObjectBase
     private void Start()
     {
         recognitionDistance = 0.8f;
+        LastMatingTime = World.CurrentGameWorldTimeMS;
 
         stateList.Add("Idle", new Idle(this));
         stateList.Add("Eat", new Eat(this));
@@ -46,7 +47,7 @@ public class Duck : ObjectBase
 
         ChangeState("Idle");
 
-        lifespan = UnityEngine.Random.Range(World.oneDay * 100.0f, World.oneDay * 180.0f); //수명은 100일 ~ 180일 사이
+        lifespan = UnityEngine.Random.Range(World.oneDay * 100, World.oneDay * 180); //수명은 100일 ~ 180일 사이
 
         agent = GetComponent<NavMeshAgent>();
 
@@ -99,6 +100,12 @@ public class Duck : ObjectBase
 
     void DuckDie()
     {
+        //혹시 뭐 옮기고 있었다면 떨구자
+        if( currentState == stateList["Carry"] )
+        {
+            currentState.Exit();
+        }
+
         Debug.Log($"{ObjectID} : 꽥!");
         World.GetInstance().OnDuckDied(this);
         GameObject.Destroy(this.gameObject);
