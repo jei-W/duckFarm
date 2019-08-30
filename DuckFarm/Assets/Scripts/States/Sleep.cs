@@ -14,6 +14,8 @@ public class Sleep : State
 
     public override void Enter( object extraData = null )
     {
+        base.Enter(extraData);
+
         Debug.Log($"{owner.ObjectID} 졸려!");
         closeShelter = World.GetInstance().FindCloseBuilding(owner, World.BuildingType.shelter) as PocketBuilding;
 
@@ -37,9 +39,10 @@ public class Sleep : State
 
     public override void Exit()
     {
-        //초기값으로 셋팅
-        hungerChangeValue = 10f;
-        fatigueChangeValue = 5f;
+        ////초기값으로 셋팅
+        //hungerChangeValue = 10f;
+        //fatigueChangeValue = 5f;
+        currentState = "";
 
         //타이머 등록해제
         if( wakeUpTimer != 0 )
@@ -53,14 +56,14 @@ public class Sleep : State
     {
         if ( timerID == wakeUpTimer )
         {
-            Debug.Log($"{owner.ObjectID} 일어났따! ({World.CurrentGameWorldTimeMS})");
-            owner.ChangeState("Idle");
-
             // 나를 꺼내쥬....
-            if ( currentState == "sleepShelter" && closeShelter != null )
+            if( currentState == "sleepShelter" && closeShelter != null )
                 closeShelter.ExitObject(owner.ObjectID);
 
             wakeUpTimer = 0;
+
+            Debug.Log($"{owner.ObjectID} 일어났따! ({World.CurrentGameWorldTimeMS})");
+            owner.ChangeState("Idle");
         }
     }
 
@@ -70,14 +73,15 @@ public class Sleep : State
             return;
 
         currentState = state;
-        if ( state == "sleepGround" || state == "sleepShelter" )
+        if ( state == "sleepGround" )
         {
-            Debug.Log($"{owner.ObjectID} 잔다!");
-            //땅바닥이던 축사던, 잔다
+            Debug.Log($"{owner.ObjectID} 땅바닥에서 잔다!");
             ownerAgent.isStopped = true;
-            // 한번만 해야할 것 같은데.. 흠 
 
-            owner.Sleeping(currentState);
+            //owner.Sleeping(currentState);
+            hungerChangeValue = 3f;
+            fatigueChangeValue = -25f;
+
             //랜덤시간 타이머 등록
             if( wakeUpTimer != 0 )
             {
@@ -89,22 +93,36 @@ public class Sleep : State
             wakeUpTimer = WorldTimer.GetInstance().RegisterTimer(World.CurrentGameWorldTimeMS + (int)sleepTime, OnWakeUpCallback);
             Debug.Log($"{sleepTime} 있다가 일어날래!({World.CurrentGameWorldTimeMS})");
         }
+        if( state == "sleepShelter" )
+        {
+            Debug.Log($"{owner.ObjectID} 축사에서 잔다!");
+            ownerAgent.isStopped = true;
+
+            //owner.Sleeping(currentState);
+            hungerChangeValue = 0f;
+            fatigueChangeValue = -50f;
+
+            //랜덤시간 타이머 등록
+            if( wakeUpTimer != 0 )
+            {
+                WorldTimer.GetInstance().UnregisterTimer(wakeUpTimer);
+                wakeUpTimer = 0;
+            }
+
+            // 타이머가 계속 .. 생성되고 제거되고 있다.
+            wakeUpTimer = WorldTimer.GetInstance().RegisterTimer(World.CurrentGameWorldTimeMS + (int)sleepTime, OnWakeUpCallback);
+            Debug.Log($"{sleepTime} 있다가 일어날래!({World.CurrentGameWorldTimeMS})");
+        }
         else if ( state == "goingToShelter")
         {
 
         }
     }
 
-    public override void FixedUpdate()
-    {
-        // 물리의 위치비교니깐.. 여기서 해야겠는걸?
 
-        // 거리가 0.01f... 일수가 없을 것 같아요. 왜냐하면 쉘터의 오브젝트 한 중앙일텐데, 충돌 영역 때문에 
-        // 오리가 저만큼 다가가지 않을꺼거든.
-        // 저 정도가 안정거리 일텐데, position 보면은 절대 거리 차가 0.01f 가 안될거여요.
-        // 로그 봤듯이 거리차이가 1.5 이상이여요
-        // 정확하게 검사하려면, 타겟 오브젝트의 충돌 영역 반지름, 나의 반지름의 합. 이될거여요.
-        // 아니면 정확하게 충돌영역 밖의 입장 위치를 넣어두는게 좋을 것 같아요.
+    public override void Update()
+    {
+        base.Update();
 
         if( currentState == "goingToShelter" )
         {
@@ -115,17 +133,9 @@ public class Sleep : State
                 closeShelter.EnterObject(owner);
                 ChangeSleeping("sleepShelter");
             }
-        }
-    }
 
-    public override void Update()
-    {
-        base.Update();
-
-        if( currentState == "goingToShelter" )
-        {
             // 아래부분은 매 프레임 검사해줘야 하는 것이므로, 업데이트 함수에서...
-            if( owner.Fatigue >= 97.0f || closeShelter == null ) // 혹시나 남겨둠.
+            if( owner.Fatigue >= 93.0f || closeShelter == null ) // 혹시나 남겨둠.
             {
                 // 너무 졸립다! 
                 ChangeSleeping("sleepGround");

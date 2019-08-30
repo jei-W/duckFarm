@@ -115,6 +115,27 @@ public class MainStorage : BuildingBase, IFoodConsumeableBuilding, IResourceCons
         return foodValue;
     }
 
+    public void BecameRottenFood( Food targetFood )
+    {
+        string key = "";
+        foreach(var food in foodList)
+        {
+            if( food.Value == targetFood )
+            {
+                key = food.Key;
+                break;
+            }
+        }
+
+        if( foodList.ContainsKey(key) )
+        {
+            foodList.Remove(key);
+            CurrentFoodCapacity--;
+
+            World.GetInstance().RotAwayFood(targetFood);
+        }
+    }
+
     public Resource GetResource( World.ResourceType type )
     {
         string resourceKey = null;

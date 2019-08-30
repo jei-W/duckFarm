@@ -16,6 +16,8 @@ public class Eat : State
 
     public override void Enter( object extraData = null )
     {
+        base.Enter(extraData);
+
         Debug.Log("배고파!");
 
         //1순위- 사료공장, 2순위- 저장소, 3순위- 완료된 작물, 4순위- 물고기and지렁이
@@ -32,7 +34,7 @@ public class Eat : State
 
     public override void Update()
     {
-        if( owner.Hunger <= 30 )
+        if( owner.Hunger <= 45 )
         {
             owner.ChangeState("Idle");
             return;
@@ -61,12 +63,11 @@ public class Eat : State
                 }
                 break;
             case "goingToSomethingFood":
-                if( targetFood == null )
+                if( targetFood == null || targetFood.transform.parent != null )
                     ChangeEatingState("FindSomethingFood");
                 break;
             default:
                 Debug.Log("state가 잘못됐어!");
-                ChangeEatingState("goingToRestaurant");
                 break;
 
         }

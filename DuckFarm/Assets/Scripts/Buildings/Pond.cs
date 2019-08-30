@@ -45,6 +45,15 @@ public class Pond : BuildingBase, IFoodConsumeableBuilding
     public Food GetFood()
     {
         // 즉석에서 물고기 생성하여 반환
-        return World.GetInstance().ProduceFood(World.FoodType.fish);
+        var food = World.GetInstance().ProduceFood(World.FoodType.fish);
+        //반환되는 물고기는 신선하다
+        food.ResetFreshness();
+        return food;
+    }
+
+    public void BecameRottenFood( Food targetFood )
+    {
+        //상한 물고기가 생기면 신선도를 초기화 한다
+        targetFood.ResetFreshness();
     }
 }

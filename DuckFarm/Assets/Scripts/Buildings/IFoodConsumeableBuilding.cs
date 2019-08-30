@@ -8,4 +8,5 @@ interface IFoodConsumeableBuilding
     bool FoodIsEmpty();
     bool InputFood( Food targetObject );
     Food GetFood();
+    void BecameRottenFood( Food targetFood );
 }

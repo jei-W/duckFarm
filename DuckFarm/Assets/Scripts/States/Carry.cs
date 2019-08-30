@@ -17,6 +17,8 @@ public class Carry : State
 
     public override void Enter( object extraData = null )
     {
+        base.Enter(extraData);
+
         var data = extraData as Dictionary<string, ObjectBase>;
         if( data == null )
         {
@@ -27,7 +29,7 @@ public class Carry : State
         targetBuilding = data["targetBuilding"] as BuildingBase;
 
         //이미 타겟오브젝트를 들고 있는 상태라면
-        if( targetObject.transform.parent == owner )
+        if( targetObject.transform.parent == owner.transform )
         {
             owner.Move(targetBuilding.transform.position);
             currentState = "goToDestinate";
@@ -45,7 +47,7 @@ public class Carry : State
     {
         // 물건을 옮기는 중에 나간다면
         if( isWorkOver == false )
-        {
+        { 
             //옮기던 물건을 바닥에 떨군다
             Debug.Log($"{owner.name} : 긴급탈출! {targetObject.name} 못옮겨!");
             targetObject.transform.parent = null;
@@ -60,6 +62,16 @@ public class Carry : State
     {
         base.Update();
 
+        //타겟을 이미 딴놈이 옮기고 있거나 없어졌다
+        if( targetObject == null || ( targetObject.transform.parent != null && targetObject.transform.parent != owner.transform ) )
+        {
+            Debug.Log($"{owner.name} : 없어졌어! 못옮겨!");
+            isWorkOver = true;
+
+            owner.ChangeState("Idle");
+            return;
+        }
+
         //집어넣는게 불가능한 상태면 대기상태로 돌아간다
         if( currentState == "goToDestinate" )
         {
@@ -71,7 +83,7 @@ public class Carry : State
                     return;
                 }
             }
-            else if( targetBuilding is IFoodConsumeableBuilding )
+            else if( targetBuilding is IFoodConsumeableBuilding && targetObject is Food )
             {
                 if( ( targetBuilding as IFoodConsumeableBuilding ).FoodIsFull() )
                 {
@@ -79,7 +91,7 @@ public class Carry : State
                     return;
                 }
             }
-            else if( targetBuilding is IResourceConsumeableBuilding )
+            else if( targetBuilding is IResourceConsumeableBuilding && targetObject is Resource )
             {
                 if( ( targetBuilding as IResourceConsumeableBuilding ).ResourceIsFull() )
                 {

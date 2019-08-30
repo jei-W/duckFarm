@@ -11,6 +11,7 @@ public class Duck : ObjectBase
     public bool male;
     float age = 0;   //단위 = 1일
     long lifespan;
+    long birthTime = 0;
     float originalHeat = 60f; //기초발정확률
 
     public float CurrentHeat { get; private set; }
@@ -45,16 +46,16 @@ public class Duck : ObjectBase
         stateList.Add("Fishing", new Fishing(this));
         stateList.Add("Carry", new Carry(this));
 
-        ChangeState("Idle");
-
         lifespan = UnityEngine.Random.Range(World.oneDay * 100, World.oneDay * 180); //수명은 100일 ~ 180일 사이
-
+        birthTime = World.CurrentGameWorldTimeMS;
         agent = GetComponent<NavMeshAgent>();
 
         //암컷오리는 발정확률이 숫컷보다 낮다
         if( male == false )
             originalHeat = 40f;
         CurrentHeat = originalHeat;
+
+        ChangeState("Idle");
     }
 
     private void FixedUpdate()
@@ -70,7 +71,7 @@ public class Duck : ObjectBase
             transform.rotation = Quaternion.LookRotation(agent.velocity.normalized);
 
         //오리 나이를 증가시키자
-        age += Time.deltaTime * World.oneDay;
+        age = (( World.CurrentGameWorldTimeMS - birthTime ) / World.oneDay ) + 1;
 
         //긴급 생존 조건
         if( Hunger >= 90 )
@@ -176,24 +177,24 @@ public class Duck : ObjectBase
         agent.isStopped = false;
     }
 
-    public void Sleeping(string state)
-    {
-        Debug.Log($"{ObjectID} :zz..");
-        if( !agent.isStopped )
-            agent.isStopped = true;
+    //public void Sleeping(string state)
+    //{
+    //    Debug.Log($"{ObjectID} :zz..");
+    //    if( !agent.isStopped )
+    //        agent.isStopped = true;
 
-        switch( state )
-        {
-            case "sleepGround":
-                currentState.hungerChangeValue = 10f;
-                currentState.fatigueChangeValue = -25f;
-                break;
-            case "sleepShelter":
-                currentState.hungerChangeValue = 0f;
-                currentState.fatigueChangeValue = -40f;
-                break;
-        }
-    }
+    //    switch( state )
+    //    {
+    //        case "sleepGround":
+    //            currentState.hungerChangeValue = 10f;
+    //            currentState.fatigueChangeValue = -25f;
+    //            break;
+    //        case "sleepShelter":
+    //            currentState.hungerChangeValue = 0f;
+    //            currentState.fatigueChangeValue = -40f;
+    //            break;
+    //    }
+    //}
 
     //오리의 행동 우선순위
     #region Priority

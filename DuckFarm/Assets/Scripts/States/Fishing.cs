@@ -18,6 +18,8 @@ public class Fishing : State
 
     public override void Enter( object extraData = null )
     {
+        base.Enter(extraData);
+
         // extraData에는 연못(buildingBase가 들어있을 것이다)
         targetPond = extraData as Pond;
         if ( targetPond == null )

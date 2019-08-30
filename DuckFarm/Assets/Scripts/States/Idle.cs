@@ -6,8 +6,6 @@ using UnityEngine.AI;
 
 public class Idle : State
 {
-    Vector3 randomPosition;
-
     Func<bool> changeStateToMatingCondition;
     Func<bool> jobConditionForFishing;
     Func<bool> jobConditionForCarryEggToHatchery;
@@ -86,7 +84,7 @@ public class Idle : State
         changeStateToEatCondition = () => owner.Hunger >= 60;
         changeStateToEat = () => owner.ChangeState("Eat");
 
-        changeStateToSleepCondition = () => owner.Fatigue >= 70;
+        changeStateToSleepCondition = () => owner.Fatigue >= 60;
         changeStateToSleep = () => owner.ChangeState("Sleep");
 
         //우선순위 리스트에 다 때려넣어보자
@@ -107,8 +105,10 @@ public class Idle : State
 
     public override void Enter( object extraData = null )
     {
-        randomPosition = RandomPosition();
+        base.Enter(extraData);
+
         owner.GetComponent<NavMeshAgent>().autoBraking = false;
+        WanderRandomPosition();
 
         Debug.Log("대기!");
     }
@@ -143,13 +143,12 @@ public class Idle : State
             // 근데 결국은 다시 무한발정 이잖아??
             if( ownerAgent.remainingDistance < 0.5f )
             {
-                randomPosition = RandomPosition();
-                owner.Move(randomPosition);
+                WanderRandomPosition();
             }
         }
     }
 
-    Vector3 RandomPosition()
+    void WanderRandomPosition()
     {
         float radius = 3f;
         Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * radius;
@@ -160,6 +159,7 @@ public class Idle : State
         {
             finalPosition = hit.position;
         }
-        return finalPosition;
+
+        owner.Move(finalPosition);
     }
 }

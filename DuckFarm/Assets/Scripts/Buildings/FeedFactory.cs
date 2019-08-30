@@ -40,4 +40,11 @@ public class FeedFactory : BuildingBase, IFoodConsumeableBuilding
         //재료를 집어넣는 기능?
         throw new System.NotImplementedException();
     }
+
+    public void BecameRottenFood( Food targetFood )
+    {
+        //푸드팩토리에서 음식이 상하지 않는다
+        //상한 식량이 생기면 신선도를 초기화 한다
+        targetFood.ResetFreshness();
+    }
 }

@@ -9,7 +9,7 @@ public class State
     protected NavMeshAgent ownerAgent;
     //하루동안 변화하는 양
     public float hungerChangeValue = 10f;
-    public float fatigueChangeValue = 5f;
+    public float fatigueChangeValue = 7f;
 
     public State( Duck duck )
     {
@@ -19,9 +19,10 @@ public class State
 
     // extraData : State가 시작할 때, 필요한 정보가 있다면 넘긴다.
     // 각 스테이트에서 알아서 추론해서 사용할 것,
-    public virtual void Enter( object extraData = null)
+    public virtual void Enter( object extraData = null )
     {
-        
+        hungerChangeValue = 10f;
+        fatigueChangeValue = 7f;
     }
 
     public virtual void Exit()

@@ -224,6 +224,14 @@ public class World : MonoBehaviour
             eggCount--;
     }
 
+    public void RotAwayFood( Food food )
+    {
+        //월드에 푸드가 없어졌음을 알린다
+        // = 오리가 푸드를 먹은것과 같은 기능을 한다
+        Debug.Log($"{food.name}이 썩어 없어졌다");
+        DuckAteFood(food);
+    }
+
     //가까이에 있는 건물를 알려주자
     public BuildingBase FindCloseBuilding(ObjectBase finder, BuildingType buildingType)
     {

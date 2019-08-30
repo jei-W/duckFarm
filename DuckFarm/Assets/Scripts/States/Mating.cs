@@ -7,16 +7,45 @@ public class Mating : State
     Duck partner;
     string currentState = "";
     bool isReadyMakeEgg = false;
+    long matingTimer = 0;
+
     public Mating( Duck duck ) : base(duck) { }
     public override void Enter( object extraData = null )
     {
+        base.Enter(extraData);
+
         isReadyMakeEgg = false;
         partner = World.GetInstance().FindCloseOppositeSexDuck(owner);
         ChangeMatingState("followingPartner");
+
+        //타이머 등록 : 오리는 발정시 상대 오리를 3일 만 따라다닌다
+        if( matingTimer != 0 )
+        {
+            WorldTimer.GetInstance().UnregisterTimer(matingTimer);
+            matingTimer = 0;
+        }
+        matingTimer = WorldTimer.GetInstance().RegisterTimer(World.CurrentGameWorldTimeMS + World.oneDay * 3, EscapeState);
+    }
+
+    void EscapeState( long timerID )
+    {
+        if( timerID == matingTimer )
+        {
+            Debug.Log($"{owner.ObjectID} 에잇! 사랑이 식었어!");
+            owner.ChangeState("Idle");
+
+            matingTimer = 0;
+        }
     }
 
     public override void Exit()
     {
+        if( matingTimer != 0 )
+        {
+            WorldTimer.GetInstance().UnregisterTimer(matingTimer);
+            matingTimer = 0;
+        }
+
         owner.ResetCurrentHeat();
         owner.LastMatingTime = World.CurrentGameWorldTimeMS;
     }
@@ -91,10 +120,5 @@ public class Mating : State
                 //알을 옮기는건 job..
             }
         }
-    }
-
-    void EscapeState(long timeID)
-    {
-
     }
 }
