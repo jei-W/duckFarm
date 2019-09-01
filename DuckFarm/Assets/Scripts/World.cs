@@ -23,6 +23,31 @@ public class World : MonoBehaviour
         return _instance;
     }
 
+    public bool OnClickDuck( Vector2 mousePosition )
+    {
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+
+        if( Physics.Raycast(ray, out hit) && hit.transform.tag == "Duck" )
+        {
+            Debug.Log($"{hit.transform.name} : 오리 눌렸어");
+            MainUI.Instance.ShowDuckState(hit.transform.GetComponent<Duck>());
+            return true;
+        }
+        else
+        {
+            if( hit.transform == null )
+            {
+                Debug.Log("안눌렸어");
+                MainUI.Instance.HideDuckState();
+            }
+            else
+                Debug.Log("오리 아니야");
+
+            return false;
+        }
+    }
+
     //public enum 건물타입
     public enum BuildingType { mainStorage, hatchery, shelter, feedFactory, pond }
     public enum FoodType { egg, worm, fish, feed, crop }
@@ -67,6 +92,8 @@ public class World : MonoBehaviour
     }
 
     static long s_uniqueID = 0;
+    static long s_duckUniqueID = 1;
+
     void CreateNewGame()
     {
         //중앙창고건물 생성
@@ -174,7 +201,7 @@ public class World : MonoBehaviour
         Debug.Log("삐약");
 
         GameObject objectBase = Instantiate(Resources.Load("Prefabs/duck"), hatchery.transform.position, Quaternion.identity) as GameObject;
-        string objectID = $"duck_{s_uniqueID++}";
+        string objectID = $"duck_{s_duckUniqueID++}";
         Duck duckling = objectBase.GetComponent<Duck>();
         duckling.ObjectID = objectID;
         duckling.male = egg.male;

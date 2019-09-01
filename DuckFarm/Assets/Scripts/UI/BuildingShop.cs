@@ -42,14 +42,16 @@ public class BuildingShop : MonoBehaviour
 
     public bool OnMouseDown(Vector2 position)
     {
-        if ( validInstallPosition == false )
-            return false;
-
-        World.GetInstance().BuildBuilding(preInstallBuildingType, preInstallBuilding.position);
-
         Destroy(preInstallBuilding.gameObject);
         InputSystemManager.Instance.UnregisterMouseDownEvent(OnMouseDown);
-        return true;
+
+        if( validInstallPosition == false )
+            return false;
+        else
+        {
+            World.GetInstance().BuildBuilding(preInstallBuildingType, preInstallBuilding.position);
+            return true;
+        }
     }
     
     public void OnClickCreateBuilding( string buildingType )

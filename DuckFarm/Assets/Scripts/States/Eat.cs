@@ -109,7 +109,7 @@ public class Eat : State
                 owner.Move(targetBuilding.transform.position);
                 break;
             case "EatingAtRestaurant":
-                Debug.Log("냠냠");
+                Debug.Log($"{owner.ObjectID} : 냠냠");
                 targetFood = restaurant.GetFood();
                 owner.EatFood(targetFood);
                 owner.ChangeState("Idle");
@@ -147,7 +147,7 @@ public class Eat : State
                     return;
                 }
 
-                Debug.Log("냠냠");
+                Debug.Log($"{owner.ObjectID} : 냠냠");
                 owner.EatFood(targetFood);
                 owner.ChangeState("Idle");
                 break;

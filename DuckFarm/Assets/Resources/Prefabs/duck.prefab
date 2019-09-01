@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 6638652173855952065}
   - component: {fileID: 8554936003672259247}
   - component: {fileID: 40186643959457524}
+  - component: {fileID: 1800066817107179250}
   m_Layer: 0
   m_Name: duck
-  m_TagString: Untagged
+  m_TagString: Duck
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -46,6 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6ed8c0fef370f94a8da2b8ffdd70889, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  recognitionDistance: 1
   male: 0
   LastMatingTime: 0
 --- !u!195 &8554936003672259247
@@ -82,8 +84,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffd5fae73a22b1645a05ef83beaac296, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stateBar: {fileID: 8013200648654715523, guid: 23c6c796f0e7b804b9e6c6beed9f2ad2,
-    type: 3}
+--- !u!136 &1800066817107179250
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4024126480542625367}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!1001 &8707887081852036914
 PrefabInstance:
   m_ObjectHideFlags: 0

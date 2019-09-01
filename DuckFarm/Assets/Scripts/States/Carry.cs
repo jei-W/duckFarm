@@ -28,16 +28,19 @@ public class Carry : State
         targetObject = data["target"];
         targetBuilding = data["targetBuilding"] as BuildingBase;
 
-        //이미 타겟오브젝트를 들고 있는 상태라면
-        if( targetObject.transform.parent == owner.transform )
+        if ( targetObject != null )
         {
-            owner.Move(targetBuilding.transform.position);
-            currentState = "goToDestinate";
-        }
-        else
-        {
-            owner.Move(targetObject.transform.position);
-            currentState = "goToObject";
+            //이미 타겟오브젝트를 들고 있는 상태라면
+            if( targetObject.transform.parent == owner.transform )
+            {
+                owner.Move(targetBuilding.transform.position);
+                currentState = "goToDestinate";
+            }
+            else
+            {
+                owner.Move(targetObject.transform.position);
+                currentState = "goToObject";
+            }
         }
 
         isWorkOver = false;
