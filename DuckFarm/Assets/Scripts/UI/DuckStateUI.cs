@@ -13,17 +13,19 @@ public class DuckStateUI : MonoBehaviour
     Vector3 stateBarScale;
 
     Duck selecedDuck;
+    bool active;
 
     // Start is called before the first frame update
     void Start()
     {
         stateBarScale = hungerStateBar.transform.localScale;
+        active = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(this.gameObject.activeInHierarchy)
+        if( active )
         {
             curretnDuckState.text = selecedDuck.GetCurrentStateName();
             hungerStateBar.transform.localScale = new Vector3(selecedDuck.Hunger * 0.01f, stateBarScale.y, stateBarScale.z);
@@ -39,5 +41,12 @@ public class DuckStateUI : MonoBehaviour
         string sex = duck.male ? "♂" : "♀";
         selectedDuckName.text = $"▶ {duck.name} ({sex})";
         selecedDuck = duck;
+        this.gameObject.SetActive(true);
+        active = true;
+    }
+    public void CloseDuckDataPopup()
+    {
+        this.gameObject.SetActive(false);
+        active = false;
     }
 }

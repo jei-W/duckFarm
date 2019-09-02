@@ -19,21 +19,11 @@ public class EggSelectMenu : MonoBehaviour
 
     public void OnCarryOnEggToHatchery()
     {
-        // 임시로 버튼을 누를 때 마다, 아무 알이나 선택. 
-        Egg groundEgg = World.GetInstance().FindEggAtGround();
-        if( groundEgg == null )
-            return;
-
-        World.GetInstance().RequestCarryOnEggToHatchery(groundEgg);
+        World.GetInstance().RequestCarryOnEggToHatchery();
     }
 
     public void OnCarryOnEggToMainStorage()
     {
-        // 임시로 버튼을 누를 때 마다, 아무 알이나 선택. 
-        Egg groundEgg = World.GetInstance().FindEggAtGround();
-        if( groundEgg == null )
-            return;
-
-        World.GetInstance().RequestCarryOnEggToMainStorage(groundEgg);
+        World.GetInstance().RequestCarryOnEggToMainStorage();
     }
 }

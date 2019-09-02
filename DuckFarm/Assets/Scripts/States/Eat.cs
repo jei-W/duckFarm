@@ -116,7 +116,6 @@ public class Eat : State
                 break;
             case "FindSomethingFood":
                 Food something = null;
-
                 // 원래라면 밭농작물 - 바닥에 떨어진 푸드 - 낚시(물고기무한정X) - 바닥에 떨어진 알 순서
                 Func<Food> foodOnGround = () => World.GetInstance().FindFoodAtGroundNotEgg();
                 Func<Food> eggOnGround = () => World.GetInstance().FindEggAtGround();
@@ -134,6 +133,12 @@ public class Eat : State
                         ChangeEatingState("goingToSomethingFood");
                         return;
                     }
+                }
+                //연못이 없으면 대기
+                if( World.GetInstance().FindCloseBuilding(owner, World.BuildingType.pond) == null )
+                {
+                    owner.ChangeState("Idle");
+                    return;
                 }
                 owner.ChangeState("Fishing", World.GetInstance().FindCloseBuilding(owner, World.BuildingType.pond));
                 break;

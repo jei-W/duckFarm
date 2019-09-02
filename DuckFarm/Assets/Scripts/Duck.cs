@@ -177,41 +177,22 @@ public class Duck : ObjectBase
         agent.isStopped = false;
     }
 
-    //public void Sleeping(string state)
-    //{
-    //    Debug.Log($"{ObjectID} :zz..");
-    //    if( !agent.isStopped )
-    //        agent.isStopped = true;
-
-    //    switch( state )
-    //    {
-    //        case "sleepGround":
-    //            currentState.hungerChangeValue = 10f;
-    //            currentState.fatigueChangeValue = -25f;
-    //            break;
-    //        case "sleepShelter":
-    //            currentState.hungerChangeValue = 0f;
-    //            currentState.fatigueChangeValue = -40f;
-    //            break;
-    //    }
-    //}
-
     //오리의 행동 우선순위
     #region Priority
     //우선순위는 3순위까지 있음
-    public Dictionary<string, KeyValuePair<Func<bool>, Action>>[] priorityLists = new Dictionary<string, KeyValuePair<Func<bool>, Action>>[3];
+    public Dictionary<string, KeyValuePair<Func<bool>, Action>>[] priorityLists = new Dictionary<string, KeyValuePair<Func<bool>, Action>>[4];
 
     public void ChangePriorityRanking(string targetKey, int priorityRank)
     {
-        if( priorityRank > 2 || priorityRank < 0 )
+        if( priorityRank > 3 || priorityRank < 0 )
         {
-            Debug.Log("우선순위는 0~2까지 있음");
+            Debug.Log("우선순위는 0~3까지 있음");
             return;
         }
 
         KeyValuePair<Func<bool>, Action> target;
 
-        for( int i = 0; i < 3; i++ )
+        for( int i = 0; i < 4; i++ )
         {
             if( priorityLists[i].ContainsKey(targetKey) )
             {
@@ -223,10 +204,11 @@ public class Duck : ObjectBase
 
                 target = priorityLists[i][targetKey];
                 priorityLists[i].Remove(targetKey);
+                Debug.Log($"{targetKey} : {i}순위 -> {priorityRank}순위");
                 break;
             }
 
-            if( i == 2 ) //끝까지 targetKey가없었다면
+            if( i == 3 ) //끝까지 targetKey가없었다면
             {
                 Debug.Log("string targetKey가 잘못되었음");
                 return;

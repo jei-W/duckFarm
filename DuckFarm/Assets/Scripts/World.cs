@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 using UnityEngine;
 
 public class World : MonoBehaviour
@@ -25,6 +26,10 @@ public class World : MonoBehaviour
 
     public bool OnClickDuck( Vector2 mousePosition )
     {
+        //UI위에서 클릭이 일어났다면
+        if( EventSystem.current.IsPointerOverGameObject() )
+            return false;
+
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(mousePosition);
 
@@ -65,6 +70,7 @@ public class World : MonoBehaviour
     public enum JobType
     {
         CatchFishingInPond, // 연못에서 물고기 잡기
+        CarryOnEgg, //알을 옮겨
         CarryOnEggToHatchery, // 알을 부화장에 넣어
         CarryOnEggToMainStorage, // 알을 창고에 넣어
         CarrySomethingStopped //뭔가 옮기다 중단됐었다..?
@@ -76,6 +82,7 @@ public class World : MonoBehaviour
         CreateNewGame();
 
         jobs.Add(JobType.CatchFishingInPond, new Queue<JobInfo>());
+        jobs.Add(JobType.CarryOnEgg, new Queue<JobInfo>());
         jobs.Add(JobType.CarryOnEggToHatchery, new Queue<JobInfo>());
         jobs.Add(JobType.CarryOnEggToMainStorage, new Queue<JobInfo>());
         jobs.Add(JobType.CarrySomethingStopped, new Queue<JobInfo>());
@@ -419,22 +426,19 @@ public class World : MonoBehaviour
         });
     }
 
-    public void RequestCarryOnEggToHatchery( Egg egg)
+    public void RequestCarryOnEggToHatchery()
     {
-        jobs[JobType.CarryOnEggToHatchery].Enqueue(new JobInfo()
-        {
-            targetObject = egg
-        }
-        );
+        jobs[JobType.CarryOnEggToMainStorage].Clear();
+        if( jobs[JobType.CarryOnEggToHatchery].Count != 0 )
+            jobs[JobType.CarryOnEggToHatchery].Enqueue(new JobInfo());
     }
-    public void RequestCarryOnEggToMainStorage( Egg egg )
+    public void RequestCarryOnEggToMainStorage()
     {
-        jobs[JobType.CarryOnEggToMainStorage].Enqueue(new JobInfo()
-        {
-            targetObject = egg
-        }
-        );
+        jobs[JobType.CarryOnEggToHatchery].Clear();
+        if( jobs[JobType.CarryOnEggToMainStorage].Count != 0 )
+            jobs[JobType.CarryOnEggToMainStorage].Enqueue(new JobInfo());
     }
+
     public void RequestCarrySomethingStopped( ObjectBase something, BuildingBase building )
     {
         jobs[JobType.CarrySomethingStopped].Enqueue(new JobInfo()

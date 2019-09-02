@@ -9,6 +9,7 @@ public class MainUI : MonoBehaviour
 
     Dictionary<string, Text> currentGameData = new Dictionary<string, Text>();
     DuckStateUI duckStatePanel;
+    PriorityListUI priorityList;
 
     // Start is called before the first frame update
     void Start()
@@ -23,7 +24,10 @@ public class MainUI : MonoBehaviour
         currentGameData.Add("FoodCount", GameObject.Find("FoodCount").GetComponent<Text>());
 
         duckStatePanel = GameObject.Find("DuckStatePanel").GetComponent<DuckStateUI>();
+        priorityList = GameObject.Find("priorityList").GetComponent<PriorityListUI>();
+
         duckStatePanel.gameObject.SetActive(false);
+        priorityList.gameObject.SetActive(false);
 
         //오리 클릭하면 오리 정보 보여주는 이벤트 등록
         InputSystemManager.Instance.RegisterMouseDownEvent(World.GetInstance().OnClickDuck);
@@ -42,11 +46,12 @@ public class MainUI : MonoBehaviour
     public void ShowDuckState( Duck duck )
     {
         duckStatePanel.SetSelectedDuckData(duck);
-        duckStatePanel.gameObject.SetActive(true);
+        priorityList.ShowPersonalPriorityList(duck);
     }
     public void HideDuckState()
     {
-        duckStatePanel.gameObject.SetActive(false);
+        duckStatePanel.CloseDuckDataPopup();
+        priorityList.ClosePriorityList();
     }
 
 }

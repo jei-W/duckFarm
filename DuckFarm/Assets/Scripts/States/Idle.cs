@@ -8,19 +8,17 @@ public class Idle : State
 {
     Func<bool> changeStateToMatingCondition;
     Func<bool> jobConditionForFishing;
-    Func<bool> jobConditionForCarryEggToHatchery;
-    Func<bool> jobConditionForCarryEggToMainStorage;
-    Func<bool> changeStateToEatCondition;
-    Func<bool> changeStateToSleepCondition;
     Func<bool> jobConditionForLeftWork;
+    Func<bool> surviveCondition;
+    Func<bool> jobConditionForUserCommand;
 
     Action changeStateToMating;
     Action workForFishing;
-    Action workForCarryEggToHatchery;
-    Action workForCarryEggToMainStorage;
-    Action changeStateToEat;
-    Action changeStateToSleep;
     Action workForSomethingToLeft;
+    Action changeStateToSurvive;
+    Action workForUserCommand;
+
+
 
     public Idle( Duck duck ) : base(duck)
     {
@@ -55,51 +53,52 @@ public class Idle : State
                 owner.ChangeState("Fishing", job.targetBuilding);
         };
 
-        jobConditionForCarryEggToHatchery = () => World.GetInstance().IsJobEmpty(World.JobType.CarryOnEggToHatchery) == false;
-        workForCarryEggToHatchery = () => {
-            // 알옮기자, 부화장으로
-            JobInfo job = World.GetInstance().GetFirstJob(World.JobType.CarryOnEggToHatchery);
-            if( job != null )
+        jobConditionForUserCommand = () => ( World.GetInstance().FindEggAtGround() != null
+            || World.GetInstance().IsJobEmpty(World.JobType.CarryOnEggToHatchery) == false
+            || World.GetInstance().IsJobEmpty(World.JobType.CarryOnEggToMainStorage) == false );
+        workForUserCommand = () =>
+        {
+            Egg eggOnGround = World.GetInstance().FindEggAtGround();
+            if( World.GetInstance().IsJobEmpty(World.JobType.CarryOnEggToHatchery) == false )
             {
+                // job은 꺼내지 않는다(계속 유지)
+                // 알옮기자, 부화장으로
                 owner.ChangeState("Carry", new Dictionary<string, ObjectBase>() {
-                        { "target", job.targetObject },
-                        { "targetBuilding", World.GetInstance().FindEnterablePocketBuilding(owner, World.BuildingType.hatchery) }
-                });
+                        { "target", eggOnGround },
+                        { "targetBuilding", World.GetInstance().FindEnterablePocketBuilding(owner, World.BuildingType.hatchery) } });
             }
+            else if( World.GetInstance().IsJobEmpty(World.JobType.CarryOnEggToMainStorage) == false )
+            {
+                // 알옮기자, 저장고로
+                owner.ChangeState("Carry", new Dictionary<string, ObjectBase>() {
+                        { "target", eggOnGround },
+                        { "targetBuilding", World.GetInstance().FindMainStorage() }});
+            }
+            return;
         };
 
-        jobConditionForCarryEggToMainStorage = () => World.GetInstance().IsJobEmpty(World.JobType.CarryOnEggToMainStorage) == false;
-        workForCarryEggToMainStorage = () => {
-            // 알옮기자, 저장고로
-            JobInfo job = World.GetInstance().GetFirstJob(World.JobType.CarryOnEggToMainStorage);
-            if( job != null )
-            {
-                owner.ChangeState("Carry", new Dictionary<string, ObjectBase>() {
-                        { "target", job.targetObject },
-                        { "targetBuilding", World.GetInstance().FindMainStorage() }
-                });
-            }
+        surviveCondition = () => owner.Hunger >= 60 || owner.Fatigue >= 60;
+        changeStateToSurvive = () => {
+            if( owner.Hunger >= owner.Fatigue )
+                owner.ChangeState("Eat");
+            else
+                owner.ChangeState("Sleep");
         };
-
-        changeStateToEatCondition = () => owner.Hunger >= 60;
-        changeStateToEat = () => owner.ChangeState("Eat");
-
-        changeStateToSleepCondition = () => owner.Fatigue >= 60;
-        changeStateToSleep = () => owner.ChangeState("Sleep");
 
         //우선순위 리스트에 다 때려넣어보자
-        owner.priorityLists[0] = new Dictionary<string,KeyValuePair<Func<bool>, Action>> {
-            { "CarrySomethingStopped", new KeyValuePair<Func<bool>,Action>(jobConditionForLeftWork, workForSomethingToLeft) },
-            { "ChangeStateToFishing", new KeyValuePair<Func<bool>,Action>(jobConditionForFishing, workForFishing) },
-            { "CarryEggToHatchery", new KeyValuePair<Func<bool>,Action>(jobConditionForCarryEggToHatchery, workForCarryEggToHatchery) },
-            { "CarryEggToMainStorage", new KeyValuePair<Func<bool>,Action>(jobConditionForCarryEggToMainStorage, workForCarryEggToMainStorage) },
+        //0순위는 부동
+        owner.priorityLists[0] = new Dictionary<string, KeyValuePair<Func<bool>, Action>> {
+            { "CarrySomethingStopped", new KeyValuePair<Func<bool>,Action>(jobConditionForLeftWork, workForSomethingToLeft) }
         };
-        owner.priorityLists[1] = new Dictionary<string, KeyValuePair<Func<bool>, Action>> {
-            { "ChangeStateToEat", new KeyValuePair<Func<bool>,Action>(changeStateToEatCondition, changeStateToEat) },
-            { "ChangeStateToSleep", new KeyValuePair<Func<bool>,Action>(changeStateToSleepCondition, changeStateToSleep) }
+        owner.priorityLists[1] = new Dictionary<string,KeyValuePair<Func<bool>, Action>> {
+            { "낚시", new KeyValuePair<Func<bool>,Action>(jobConditionForFishing, workForFishing) },
+            { "유저의 명령", new KeyValuePair<Func<bool>,Action>(jobConditionForUserCommand, workForUserCommand) }
         };
         owner.priorityLists[2] = new Dictionary<string, KeyValuePair<Func<bool>, Action>> {
-            { "ChangeStateToMating", new KeyValuePair<Func<bool>,Action>(changeStateToMatingCondition, changeStateToMating) }
+            { "생존", new KeyValuePair<Func<bool>,Action>(surviveCondition, changeStateToSurvive) }
+        };
+        owner.priorityLists[3] = new Dictionary<string, KeyValuePair<Func<bool>, Action>> {
+            { "번식", new KeyValuePair<Func<bool>,Action>(changeStateToMatingCondition, changeStateToMating) }
         };
     }
 
