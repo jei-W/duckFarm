@@ -49,6 +49,7 @@ public class Fishing : State
         {
             // Enter로 pond가 전달이 안되었거나 연못에 물고기가 없다
             // Idle로 변경시킨다
+            isWorkOver = true;
             owner.ChangeState("Idle");
             return;
         }

@@ -38,16 +38,34 @@ public class Idle : State
         jobConditionForLeftWork = () => World.GetInstance().IsJobEmpty(World.JobType.CarrySomethingStopped) == false;
         workForSomethingToLeft = () => {
             JobInfo job = World.GetInstance().GetFirstJob(World.JobType.CarrySomethingStopped);
+
+            bool isPossible = false;
+
             if( job != null )
+            {
+                if( job.targetBuilding is PocketBuilding )
+                    isPossible = job.targetBuilding.GetComponent<PocketBuilding>().AskEnterable();
+                else if( job.targetBuilding is IFoodConsumeableBuilding )
+                    isPossible = !job.targetBuilding.GetComponent<IFoodConsumeableBuilding>().FoodIsFull();
+                else if( job.targetBuilding is IResourceConsumeableBuilding )
+                    isPossible = !job.targetBuilding.GetComponent<IResourceConsumeableBuilding>().ResourceIsFull();
+
+                if( isPossible )
                 owner.ChangeState("Carry", new Dictionary<string, ObjectBase>() {
                         { "target", job.targetObject },
                         { "targetBuilding", job.targetBuilding }
                 });
+                else
+                    World.GetInstance().RequestCarrySomethingStopped(job.targetObject, job.targetBuilding);
+            }
         };
 
-        jobConditionForFishing = () => World.GetInstance().IsJobEmpty(World.JobType.CatchFishingInPond) == false;
+        jobConditionForFishing = () => {
+            if( World.GetInstance().FindMainStorage().GetComponent<IFoodConsumeableBuilding>().FoodIsFull() == false )
+                return true;
+            else return false;
+        };
         workForFishing = () => {
-            // 물고기 캐러 가자
             JobInfo job = World.GetInstance().GetFirstJob(World.JobType.CatchFishingInPond);
             if( job != null )
                 owner.ChangeState("Fishing", job.targetBuilding);

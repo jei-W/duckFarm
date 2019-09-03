@@ -75,12 +75,14 @@ public class Pond : BuildingBase, IFoodConsumeableBuilding
         {
             Debug.Log("물고기 생김");
             ++CurrentFoodCapacity;
-
-            if( World.GetInstance().FindMainStorage().GetComponent<IFoodConsumeableBuilding>().FoodIsFull() == false )
-                //물고기가 생기면 물고기 잡으러 오라고 시킨다
-                World.GetInstance().RequestCatchFish(this);
         }
 
+        //일정시간마다 물고기 잡는 일이 없으면 등록한다
+        if( World.GetInstance().IsJobEmpty(World.JobType.CatchFishingInPond) )
+        {
+            Debug.Log($"{this.ObjectID} 물고기 잡자");
+            World.GetInstance().RequestCatchFish(this);
+        }
         _timerID = WorldTimer.GetInstance().RegisterTimer(World.CurrentGameWorldTimeMS + World.oneDay, TimerCallback);
     }
     void TimerCallback( long timerID )
