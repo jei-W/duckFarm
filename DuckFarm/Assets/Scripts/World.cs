@@ -44,11 +44,11 @@ public class World : MonoBehaviour
             if( hit.transform == null )
             {
                 Debug.Log("안눌렸어");
-                MainUI.Instance.HideDuckState();
             }
             else
                 Debug.Log("오리 아니야");
 
+            MainUI.Instance.HideDuckState();
             return false;
         }
     }
@@ -429,14 +429,16 @@ public class World : MonoBehaviour
     public void RequestCarryOnEggToHatchery()
     {
         jobs[JobType.CarryOnEggToMainStorage].Clear();
-        if( jobs[JobType.CarryOnEggToHatchery].Count != 0 )
-            jobs[JobType.CarryOnEggToHatchery].Enqueue(new JobInfo());
+        jobs[JobType.CarryOnEggToHatchery].Clear();
+
+        jobs[JobType.CarryOnEggToHatchery].Enqueue(new JobInfo());
     }
     public void RequestCarryOnEggToMainStorage()
     {
+        jobs[JobType.CarryOnEggToMainStorage].Clear();
         jobs[JobType.CarryOnEggToHatchery].Clear();
-        if( jobs[JobType.CarryOnEggToMainStorage].Count != 0 )
-            jobs[JobType.CarryOnEggToMainStorage].Enqueue(new JobInfo());
+
+        jobs[JobType.CarryOnEggToMainStorage].Enqueue(new JobInfo());
     }
 
     public void RequestCarrySomethingStopped( ObjectBase something, BuildingBase building )

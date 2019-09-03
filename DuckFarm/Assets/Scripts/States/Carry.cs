@@ -149,7 +149,7 @@ public class Carry : State
     //옮기기 중지
     void StopCarrySomthing()
     {
-        isWorkOver = true;
+        isWorkOver = false;
 
         Debug.Log("안옮겨! 못옮겨!");
         targetObject.transform.parent = null;

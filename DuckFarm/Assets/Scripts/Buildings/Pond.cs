@@ -50,10 +50,14 @@ public class Pond : BuildingBase, IFoodConsumeableBuilding
 
     public Food GetFood()
     {
+        if( FoodIsEmpty() )
+            return null;
+
         // 즉석에서 물고기 생성하여 반환
         var food = World.GetInstance().ProduceFood(World.FoodType.fish);
         //반환되는 물고기는 신선하다
         food.ResetFreshness();
+        --CurrentFoodCapacity;
         return food;
     }
 
@@ -72,8 +76,9 @@ public class Pond : BuildingBase, IFoodConsumeableBuilding
             Debug.Log("물고기 생김");
             ++CurrentFoodCapacity;
 
-            //물고기가 생기면 물고기 잡으러 오라고 시킨다
-            World.GetInstance().RequestCatchFish(this);
+            if( World.GetInstance().FindMainStorage().GetComponent<IFoodConsumeableBuilding>().FoodIsFull() == false )
+                //물고기가 생기면 물고기 잡으러 오라고 시킨다
+                World.GetInstance().RequestCatchFish(this);
         }
 
         _timerID = WorldTimer.GetInstance().RegisterTimer(World.CurrentGameWorldTimeMS + World.oneDay, TimerCallback);

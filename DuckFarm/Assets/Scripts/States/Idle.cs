@@ -53,9 +53,9 @@ public class Idle : State
                 owner.ChangeState("Fishing", job.targetBuilding);
         };
 
-        jobConditionForUserCommand = () => ( World.GetInstance().FindEggAtGround() != null
-            || World.GetInstance().IsJobEmpty(World.JobType.CarryOnEggToHatchery) == false
-            || World.GetInstance().IsJobEmpty(World.JobType.CarryOnEggToMainStorage) == false );
+        jobConditionForUserCommand = () => ( World.GetInstance().FindEggAtGround() != null );
+            //&&( World.GetInstance().IsJobEmpty(World.JobType.CarryOnEggToHatchery) == false
+            //|| World.GetInstance().IsJobEmpty(World.JobType.CarryOnEggToMainStorage) == false ));
         workForUserCommand = () =>
         {
             Egg eggOnGround = World.GetInstance().FindEggAtGround();
@@ -87,19 +87,11 @@ public class Idle : State
 
         //우선순위 리스트에 다 때려넣어보자
         //0순위는 부동
-        owner.priorityLists[0] = new Dictionary<string, KeyValuePair<Func<bool>, Action>> {
-            { "CarrySomethingStopped", new KeyValuePair<Func<bool>,Action>(jobConditionForLeftWork, workForSomethingToLeft) }
-        };
-        owner.priorityLists[1] = new Dictionary<string,KeyValuePair<Func<bool>, Action>> {
-            { "낚시", new KeyValuePair<Func<bool>,Action>(jobConditionForFishing, workForFishing) },
-            { "유저의 명령", new KeyValuePair<Func<bool>,Action>(jobConditionForUserCommand, workForUserCommand) }
-        };
-        owner.priorityLists[2] = new Dictionary<string, KeyValuePair<Func<bool>, Action>> {
-            { "생존", new KeyValuePair<Func<bool>,Action>(surviveCondition, changeStateToSurvive) }
-        };
-        owner.priorityLists[3] = new Dictionary<string, KeyValuePair<Func<bool>, Action>> {
-            { "번식", new KeyValuePair<Func<bool>,Action>(changeStateToMatingCondition, changeStateToMating) }
-        };
+        owner.priorityLists.Add(new KeyValuePair<string, KeyValuePair<Func<bool>, Action>>("CarrySomethingStopped", new KeyValuePair<Func<bool>, Action>(jobConditionForLeftWork, workForSomethingToLeft)));
+        owner.priorityLists.Add(new KeyValuePair<string, KeyValuePair<Func<bool>, Action>>("낚시", new KeyValuePair<Func<bool>, Action>(jobConditionForFishing, workForFishing)));
+        owner.priorityLists.Add(new KeyValuePair<string, KeyValuePair<Func<bool>, Action>>("유저의 명령", new KeyValuePair<Func<bool>, Action>(jobConditionForUserCommand, workForUserCommand)));
+        owner.priorityLists.Add(new KeyValuePair<string, KeyValuePair<Func<bool>, Action>>("생존", new KeyValuePair<Func<bool>, Action>(surviveCondition, changeStateToSurvive)));
+        owner.priorityLists.Add(new KeyValuePair<string, KeyValuePair<Func<bool>, Action>>("번식", new KeyValuePair<Func<bool>, Action>(changeStateToMatingCondition, changeStateToMating)));
     }
 
     public override void Enter( object extraData = null )
@@ -128,13 +120,10 @@ public class Idle : State
             //우선순위를 차례로 검사해서 실행한다
             foreach( var priorityList in owner.priorityLists )
             {
-                foreach( var somethingAction in priorityList )
+                if( priorityList.Value.Key() )
                 {
-                    if( somethingAction.Value.Key() )
-                    {
-                        somethingAction.Value.Value();
-                        return;
-                    }
+                    priorityList.Value.Value();
+                    break;
                 }
             }
 

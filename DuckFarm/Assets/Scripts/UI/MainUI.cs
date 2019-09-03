@@ -45,6 +45,9 @@ public class MainUI : MonoBehaviour
 
     public void ShowDuckState( Duck duck )
     {
+        if( duck == null )
+            return;
+
         duckStatePanel.SetSelectedDuckData(duck);
         priorityList.ShowPersonalPriorityList(duck);
     }

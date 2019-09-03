@@ -25,6 +25,9 @@ public class DuckStateUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if( selecedDuck == null )
+            CloseDuckDataPopup();
+
         if( active )
         {
             curretnDuckState.text = selecedDuck.GetCurrentStateName();

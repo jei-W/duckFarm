@@ -180,42 +180,97 @@ public class Duck : ObjectBase
     //오리의 행동 우선순위
     #region Priority
     //우선순위는 3순위까지 있음
-    public Dictionary<string, KeyValuePair<Func<bool>, Action>>[] priorityLists = new Dictionary<string, KeyValuePair<Func<bool>, Action>>[4];
+    public List<KeyValuePair<string, KeyValuePair<Func<bool>, Action>>> priorityLists = new List<KeyValuePair<string, KeyValuePair<Func<bool>, Action>>>();
 
     public void ChangePriorityRanking(string targetKey, int priorityRank)
     {
-        if( priorityRank > 3 || priorityRank < 0 )
+        if( priorityRank > priorityLists.Count - 1 || priorityRank < 1 )
         {
-            Debug.Log("우선순위는 0~3까지 있음");
+            Debug.Log("바꿀 수 있는 우선순위밖임");
             return;
         }
 
-        KeyValuePair<Func<bool>, Action> target;
+        KeyValuePair<string, KeyValuePair<Func<bool>, Action>> target;
+        int currentRank = -1;
 
-        for( int i = 0; i < 4; i++ )
+        for( int i = 1; i < priorityLists.Count; i++ )
         {
-            if( priorityLists[i].ContainsKey(targetKey) )
+            if( priorityLists[i].Key == targetKey )
             {
-                if( priorityRank == i )
-                {
-                    Debug.Log("우선순위 변동없음");
-                    return;
-                }
-
-                target = priorityLists[i][targetKey];
-                priorityLists[i].Remove(targetKey);
-                Debug.Log($"{targetKey} : {i}순위 -> {priorityRank}순위");
+                target = priorityLists[i];
+                currentRank = i;
                 break;
-            }
-
-            if( i == 3 ) //끝까지 targetKey가없었다면
-            {
-                Debug.Log("string targetKey가 잘못되었음");
-                return;
             }
         }
 
-        priorityLists[priorityRank].Add(targetKey, target);
+        if( currentRank == -1 )
+        {
+            Debug.Log("타겟을 찾을 수 없었음");
+            return;
+        }
+        else if( currentRank == priorityRank )
+        {
+            Debug.Log("우선순위 변동없음");
+            return;
+        }
+        //우선순위가 변하면 하나씩 밀고 지정한 자리에 넣는다
+        else if( currentRank > priorityRank )
+        {
+            for( int i = currentRank; i > priorityRank; i-- )
+            {
+                priorityLists[i] = priorityLists[i - 1];
+            }
+            priorityLists[priorityRank] = target;
+        }
+        else if( currentRank < priorityRank )
+        {
+            for( int i = currentRank; i < priorityRank; i++ )
+            {
+                priorityLists[i] = priorityLists[i + 1];
+            }
+            priorityLists[priorityRank] = target;
+        }
+        Debug.Log($"{targetKey} : {currentRank}순위 -> {priorityRank}순위");
+    }
+
+    public void SwapPriorityRanking( string key1, string key2 )
+    {
+        bool isFindIndex = false;
+        int key1Index = -1;
+        int key2Index = -1;
+
+        //각각의 인덱스를 찾는다
+        for( int i = 1; i < priorityLists.Count; i++ )
+        {
+            if( priorityLists[i].Key == key1 )
+            {
+                key1Index = i;
+
+                if( isFindIndex )
+                    break;
+                else
+                    isFindIndex = true;
+            }
+            if( priorityLists[i].Key == key2 )
+            {
+                key2Index = i;
+
+                if( isFindIndex )
+                    break;
+                else
+                    isFindIndex = true;
+            }
+        }
+
+        //끝내 인덱스를 찾지 못했다면 리턴
+        if( key1Index < 0 || key2Index < 0 )
+            return;
+
+        var temp = priorityLists[key1Index];
+        priorityLists[key1Index] = priorityLists[key2Index];
+        priorityLists[key2Index] = temp;
+
+        Debug.Log($"{key1}:{key1Index}순위 <-> {key2}:{key2Index}순위");
     }
     #endregion
 }
