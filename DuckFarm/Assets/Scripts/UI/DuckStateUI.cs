@@ -41,6 +41,8 @@ public class DuckStateUI : MonoBehaviour
 
     public void SetSelectedDuckData(Duck duck)
     {
+        duck.gameObject.GetComponent<Renderer>().material = Resources.Load("Material/SelectedMat") as Material;
+
         string sex = duck.male ? "♂" : "♀";
         selectedDuckName.text = $"▶ {duck.name} ({sex})";
         selecedDuck = duck;
@@ -49,6 +51,9 @@ public class DuckStateUI : MonoBehaviour
     }
     public void CloseDuckDataPopup()
     {
+        if(selecedDuck!=null)
+        selecedDuck.gameObject.GetComponent<Renderer>().material = Resources.Load("Material/VertexColorUnlit") as Material;
+
         this.gameObject.SetActive(false);
         active = false;
     }
